@@ -3,10 +3,12 @@
         "target": "es2016",
         "module": "NodeNext",
         "outDir": "./build",
+        "rootDir": "./src",
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "skipLibCheck": true
     },
-    "include": ["src/**/*"]
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "tests", "**/*.test.ts"]
 }

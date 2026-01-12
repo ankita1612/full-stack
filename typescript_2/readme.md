@@ -4,7 +4,7 @@ packages
 +++++++++++++++++++
 npm install cors dotenv express express-validator helmet mongoose @types/cors @types/dotenv @types/helmet @types/mongoose
 
-To Run typescript
+To Run typescript in dev
 +++++++++++++++++++++++++++++++++++++
 npx ts-node-dev src/server.ts
 
