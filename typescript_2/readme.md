@@ -2,11 +2,14 @@ https://medium.com/@rachealkuranchie/how-to-build-a-crud-api-with-express-js-and
 
 packages
 +++++++++++++++++++
-npm install express @types/express
-npm install dotenv mongoose cors helmet
+npm install cors dotenv express express-validator helmet mongoose @types/cors @types/dotenv @types/helmet @types/mongoose
 
 To Run typescript
++++++++++++++++++++++++++++++++++++++
 npx ts-node-dev src/server.ts
+
+Notes : npx ts-node-dev runs your TypeScript Node app directly and restarts it automatically when files change — perfect for development, never for production.
+
 ++++++++++++++++++++++++++++++
 in production
 ++++++++++++++++++++
