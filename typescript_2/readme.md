@@ -13,13 +13,7 @@ Notes : npx ts-node-dev runs your TypeScript Node app directly and restarts it a
 ++++++++++++++++++++++++++++++
 in production
 ++++++++++++++++++++
-npx tsc
-node dist/server.js
+1)To make build : npx tsc
+2)it create dist folder in root
+3)node dist/server.js to run application
 
-{
-"scripts": {
-"dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-"build": "tsc",
-"start": "node dist/server.js"
-}
-}
