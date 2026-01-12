@@ -1,22 +1,23 @@
-https://medium.com/@rachealkuranchie/how-to-build-a-crud-api-with-express-js-and-typescript-21c7c66e5296
+1️⃣ Install required packages
+npm install --save-dev jest ts-jest @types/jest supertest @types/supertest
 
-packages
-+++++++++++++++++++
-npm install express @types/express
-npm install dotenv mongoose cors helmet
+2️⃣ Initialize Jest for TypeScript
+npx ts-jest config:init
 
-To Run typescript
-npx ts-node-dev src/server.ts
-++++++++++++++++++++++++++++++
-in production
-++++++++++++++++++++
-npx tsc
-node dist/server.js
+3️⃣Update jest.config.js
+/** @type {import('ts-jest').JestConfigWithTsJest} \*/
+module.exports = {
+preset: "ts-jest",
+testEnvironment: "node",
+testMatch: ["**/tests/\*_/_.test.ts"],
+clearMocks: true,
+verbose: true,
+};
 
-{
+4️⃣ Add test script in package.json
 "scripts": {
-"dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-"build": "tsc",
-"start": "node dist/server.js"
+"test": "jest",
+"test:watch": "jest --watch"
 }
-}
+
+5. npm test
