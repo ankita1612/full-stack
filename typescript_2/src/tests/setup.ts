@@ -8,8 +8,8 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  // if (mongoose.connection.db) {
-  //   await mongoose.connection.db.dropDatabase();
-  // }
-  // await mongoose.connection.close();
+  if (mongoose.connection.db) {
+    await mongoose.connection.db.dropDatabase();
+  }
+  await mongoose.connection.close();
 });

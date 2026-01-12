@@ -17,24 +17,22 @@ describe("Post CRUD API", () => {
     expect(res.status).toBe(201);
     expect(res.body.data.title).toBe("Jest Post");
     postId = res.body.data._id;
-    console.log("++++++++++++++"+postId)
   });
 
-  // it("should get all posts", async () => {
-  //   const res = await request(app).get("/api/v1/posts");
-  //   expect(res.status).toBe(201);
-  //   expect(res.body.success).toBe(true);
-  //   expect(Array.isArray(res.body.data)).toBe(true);
+  it("should get all posts", async () => {
+    const res = await request(app).get("/api/v1/posts");
+    expect(res.status).toBe(201);
+    expect(res.body.success).toBe(true);
+    expect(Array.isArray(res.body.data)).toBe(true);
 
-  // });
+  });
 
-  // it("should get a single post", async () => {
-  //   const res = await request(app).get(`/api/v1/posts/${postId}`);
-  //   console.log(`/api/v1/posts/${postId}`)
-  //   console.log(res.body)
-  //   expect(res.status).toBe(201);
-  //   expect(res.body.data._id).toBe(postId);
-  // });
+  it("should get a single post", async () => {
+    const res = await request(app).get(`/api/v1/posts/${postId}`);
+    console.log(res.body)
+    expect(res.status).toBe(201);
+    expect(res.body.data._id).toBe(postId);
+  });
 
   it("should update a post", async () => {
     const res = await request(app)
@@ -46,7 +44,6 @@ describe("Post CRUD API", () => {
 
   it("should delete a post", async () => {
     const res = await request(app).delete(`/api/v1/posts/${postId}`);
-
     expect(res.status).toBe(201);
   });
 });
