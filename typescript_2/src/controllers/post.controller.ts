@@ -1,32 +1,25 @@
-//import modules
 import { postServices } from '../services/post.service'
-import { Request, Response } from 'express'
-import {PostschemaValidate} from '../models/posts'
+import { Request, Response, NextFunction } from 'express'
+import  IPost  from "../interface/post.interface";
 
 class postController {
     //add post controller
-    addpost = async (req: Request, res: Response) => {
-        //data to be saved in database
-        const data = {
-            title: req.body.title,
-            author: req.body.author,
-            description: req.body.description,
-            published: req.body.published
-        }
-        //validating the request
-        //const {error, value} = PostschemaValidate.validate(data)
+     addpost = async (req: Request,res: Response,next: NextFunction): Promise<void> => {
+    try {
+      const data: IPost = {
+        title: req.body.title,
+        author: req.body.author,
+        description: req.body.description,
+        published: req.body.published,
+      };
 
-        // if(error){
-        //     res.send(error.message)
-
-        // }else
-            {
-            //call the create post function in the service and pass the data from the request
-            const post = await postServices.createPost(data)
-            res.status(201).send(post)          
-        }
-        
+      const post = await postServices.createPost(data);
+      res.status(201).json(post);
+    } catch (error) {
+      next(error);
     }
+  };
+
 
     //get all posts
     getPosts = async (req: Request, res: Response) => {
