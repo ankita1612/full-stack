@@ -1,6 +1,6 @@
 https://medium.com/@rachealkuranchie/how-to-build-a-crud-api-with-express-js-and-typescript-21c7c66e5296
 
-packages
+packages to install
 +++++++++++++++++++
 npm install cors dotenv express express-validator helmet mongoose @types/cors @types/dotenv @types/helmet @types/mongoose
 
@@ -16,4 +16,3 @@ in production
 1)To make build : npx tsc
 2)it create dist folder in root
 3)node dist/server.js to run application
-

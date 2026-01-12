@@ -1,4 +1,4 @@
-import Post from "../models/posts.model";
+import Post from "../models/post.model";
 import  IPost  from "../interface/post.interface";
 
 import { Types } from "mongoose";

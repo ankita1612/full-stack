@@ -2,7 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 dotenv.config();
 import connectDB from "./config/db.config";
-import router from "./routes/post.route";
+import postRouter from "./routes/post.route";
+import authRouter from "./routes/auth.route";
+
 import helmet from "helmet";
 import cors from "cors";
 import { Request, Response, NextFunction } from 'express'
@@ -16,8 +18,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 connectDB();
-// routes
-app.use("/api/v1/posts", router);
+app.use("/api/posts", postRouter);
+app.use("/api/auth", authRouter);
+
+
 // app.use("*", (req: Request, res: Response): void => {
 //   res.status(404).json({
 //     success: false,
