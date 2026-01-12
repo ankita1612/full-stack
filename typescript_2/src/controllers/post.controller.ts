@@ -1,57 +1,60 @@
-import { postServices } from '../services/post.service'
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response, NextFunction } from "express";
+import { postServices } from "../services/post.service";
 import  IPost  from "../interface/post.interface";
 
-class postController {
-    //add post controller
-     addpost = async (req: Request,res: Response,next: NextFunction): Promise<void> => {
+class PostController {
+  addPost = async (req: Request<{}, {}, IPost>, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const data: IPost = {
-        title: req.body.title,
-        author: req.body.author,
-        description: req.body.description,
-        published: req.body.published,
-      };
-
-      const post = await postServices.createPost(data);
-      res.status(201).json(post);
+      const post = await postServices.createPost(req.body);
+      res.status(201).json({"success":true,"message":"post created successfully","data":post});
     } catch (error) {
       next(error);
     }
   };
 
-
-    //get all posts
-    getPosts = async (req: Request, res: Response) => {
-        const posts = await postServices.getPosts()
-        res.send(posts)
+  getPosts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const posts = await postServices.getPosts();
+      res.status(200).json({"success":true,"message":"","data":posts});
+    } catch (error) {
+      next(error);
     }
+  };
 
-
-    //get a single post
-    getAPost = async (req: Request, res: Response) => {
-        //get id from the parameter
-        const id = req.params.id
-        const post = await postServices.getPost(id)
-        res.send(post)
+  getPost = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const post = await postServices.getPost(req.params.id);
+      res.status(200).json({"success":true,"message":"","data":post});
+    } catch (error) {
+      next(error);
     }
+  };
 
-    //update post
-    updatePost = async (req: Request, res: Response) => {
-        const id = req.params.id
-       const post = await postServices.updatePost(id, req.body)  
-        res.send(post)
+  updatePost = async (req: Request<{ id: string }, {}, Partial<IPost>>, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const post = await postServices.updatePost(req.params.id, req.body);
+      res.status(200).json({"success":true,"message":"Post update successfully","data":post});
+    } catch (error) {
+      next(error);
     }
+  };
 
-
-    //delete a post
-    deletePost = async (req: Request, res: Response) => {
-        const id = req.params.id
-        await postServices.deletePost(id)
-        res.send('post deleted')
+  deletePost = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      await postServices.deletePost(req.params.id);
+      res.status(204).json({"success":true,"message":"post delete successfully","data":[]});
+    } catch (error) {
+      next(error);
     }
+  };
 
+  testPost= async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const data = await postServices.testPost(req.body.id);
+      res.status(201).json({"success":true,"message":"post delete successfully","data":data});
+    } catch (error) {
+      next(error);
+    }
+  };
 }
-
-//export class
-export const PostController = new postController()
+export const postController = new PostController();

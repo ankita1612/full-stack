@@ -5,6 +5,7 @@ import connectDB from "./config/db.config";
 import router from "./routes/post.route";
 import helmet from "helmet";
 import cors from "cors";
+import { Request, Response, NextFunction } from 'express'
 
 const app = express();
 
@@ -17,6 +18,21 @@ app.use(express.urlencoded({ extended: true }));
 connectDB();
 // routes
 app.use("/api/v1/posts", router);
+// app.use("*", (req: Request, res: Response): void => {
+//   res.status(404).json({
+//     success: false,
+//     message: "Page not found",
+//   });
+// });
+
+
+app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
+  res.status(500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+    data: [],
+  });
+});
 
 let server;
 const PORT = process.env.PORT || 3000;

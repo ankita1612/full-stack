@@ -1,65 +1,65 @@
-//import module
-import  Post from '../models/posts.model'
-export class postService {
-    //create a post
-    async createPost(data: any) {
-        try {
-            const newPost = await Post.create(data)
-            return newPost
-        } catch (error) {
-            console.log(error)
-        }
+import Post from "../models/posts.model";
+import  IPost  from "../interface/post.interface";
+
+import { Types } from "mongoose";
+
+export class PostService {
+  async createPost(data: IPost): Promise<IPost> {
+    return Post.create(data);
+  }
+
+  async getPosts(): Promise<IPost[]> {
+    return Post.find();
+  }
+
+  async getPost(id: string): Promise<IPost> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new Error("Invalid post id");
     }
 
-    //get all posts
-    async getPosts() {
-        try {
-            const posts = await Post.find({})
-            return posts
-
-        } catch (error) {
-            console.log(error)
-        }
+    const post = await Post.findById(id);
+    if (!post) {
+      throw new Error("Post not found");
     }
 
-    //get a single post
-    async getPost(id: string) {
-        try {
-            const post = await Post.findById({_id:id})
-            if (!post) {
-                return 'post not available'
-            }
-            return post
+    return post;
+  }
 
-        } catch (error) {
-            console.log(error)
-        }
+  // update post
+  async updatePost(id: string, data: Partial<IPost>): Promise<IPost> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new Error("Invalid post id");
     }
 
-    //update a post
-    async updatePost(id: string, data: any) {
-        try {
-                const postz = await Post.findByIdAndUpdate({_id:id}, data, {new: true})                
-                if(!postz){
-                    return "post not available"
-                }
-                return postz          
-        } catch (error) {
-            console.log(error)
-        }
+    const post = await Post.findByIdAndUpdate(id, data, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!post) {
+      throw new Error("Post not found");
     }
 
-    //delete a post by using the find by id and delete 
-    async deletePost(id: string) {
-        try {
-            const post = await Post.findByIdAndDelete(id)
-            if (!post) {
-                return 'post not available'
-            }
-        } catch (error) {
-            console.log(error)
-        }
+    return post;
+  }
+
+  // delete post
+  async deletePost(id: string): Promise<void> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new Error("Invalid post id");
     }
+
+    const post = await Post.findByIdAndDelete(id);
+    if (!post) {
+      throw new Error("Post not found");
+    }
+  }
+  async testPost(id: string): Promise<IPost | null> {
+    const objectId = new Types.ObjectId(id);
+    const data =Post.findOne({"_id":objectId});
+    return data;
+  }
 }
-//export the class
-export const postServices = new postService()
+
+// singleton export
+export const postServices = new PostService();

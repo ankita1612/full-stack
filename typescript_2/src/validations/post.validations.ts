@@ -7,7 +7,12 @@ export const validateAdd = [
   body("description").notEmpty().withMessage("Description is required"),
   body("published").notEmpty().withMessage("Published is required"),
 ];
-
+export const validateEdit = [
+  body("title").notEmpty().withMessage("Title is required"),
+  body("author").notEmpty().withMessage("Author Name is required"),
+  body("description").notEmpty().withMessage("Description is required"),
+  body("published").notEmpty().withMessage("Published is required"),
+];
 export const isRequestValidated = (req: Request, res: Response, next: NextFunction): void => {
   const errors = validationResult(req);
 
