@@ -15,7 +15,7 @@ class PostController {
   getPosts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const posts = await postServices.getPosts();
-      res.status(200).json({"success":true,"message":"","data":posts});
+      res.status(201).json({"success":true,"message":"","data":posts});
     } catch (error) {
       next(error);
     }
@@ -24,7 +24,7 @@ class PostController {
   getPost = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
     try {
       const post = await postServices.getPost(req.params.id);
-      res.status(200).json({"success":true,"message":"","data":post});
+      res.status(201).json({"success":true,"message":"","data":post});
     } catch (error) {
       next(error);
     }
@@ -33,7 +33,7 @@ class PostController {
   updatePost = async (req: Request<{ id: string }, {}, Partial<IPost>>, res: Response, next: NextFunction): Promise<void> => {
     try {
       const post = await postServices.updatePost(req.params.id, req.body);
-      res.status(200).json({"success":true,"message":"Post update successfully","data":post});
+      res.status(201).json({"success":true,"message":"Post update successfully","data":post});
     } catch (error) {
       next(error);
     }
@@ -42,7 +42,7 @@ class PostController {
   deletePost = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
     try {
       await postServices.deletePost(req.params.id);
-      res.status(204).json({"success":true,"message":"post delete successfully","data":[]});
+      res.status(201).json({"success":true,"message":"post delete successfully","data":[]});
     } catch (error) {
       next(error);
     }
