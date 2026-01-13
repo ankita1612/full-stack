@@ -14,7 +14,8 @@ export class AuthServices {
       name: data.name,
       email: data.email,
       password: hashedPassword,
-      DOB: data.DOB
+      DOB: data.DOB,
+      profile_image: data.profile_image
     });
     return user;
   }

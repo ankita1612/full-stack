@@ -5,7 +5,12 @@ import IUser from "../interface/user.interface";
 class AuthController {
     registration = async (req: Request<{}, {},IUser>, res: Response, next: NextFunction): Promise<void> => {
         try {
-          const user = await authServices.registration(req.body);
+
+          console.log(req.body)
+          const user = await authServices.registration({
+              ...req.body,
+              profile_image: req.file?.path
+          });
           res.status(201).json({"success":true,"message":"registration successfully","data":user});
         } catch (error) {
           next(error);

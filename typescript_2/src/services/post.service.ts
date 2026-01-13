@@ -5,7 +5,14 @@ import { Types } from "mongoose";
 
 export class PostService {
   async createPost(data: IPost): Promise<IPost> {
-    return Post.create(data);
+    return Post.create({
+      title: data.title,
+      email:data.email,
+      description: data.description,
+      author: data.author,
+      published: data.published,
+      skills:data.skills
+    });
   }
 
   async getPosts(): Promise<IPost[]> {

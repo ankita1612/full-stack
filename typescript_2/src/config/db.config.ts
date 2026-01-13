@@ -5,6 +5,6 @@ if (!DB_URI) {
 }
 
 const connectDB =  async() => {
-    mongoose.connect('mongodb://localhost:27017/my_database');
+    mongoose.connect(DB_URI);
 }
 export default connectDB;
