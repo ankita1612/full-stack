@@ -7,3 +7,8 @@ export default interface IUser {
   profile_image :string
 }
 
+export interface ILoginResponse {
+  //user: Omit<IUser, "password">;
+  user: IUser;
+  token: string;
+}

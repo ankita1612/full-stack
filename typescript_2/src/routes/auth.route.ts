@@ -4,7 +4,7 @@ import { login, registration ,isRequestValidated } from '../validations/auth.val
 const router = express.Router()
 registration
 router.post('/register',registration, isRequestValidated, authController.registration)
-//router.post('/login', authController.login)
+router.post('/login', authController.login)
 
 
 export default router;
