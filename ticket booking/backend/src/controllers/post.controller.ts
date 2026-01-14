@@ -48,15 +48,13 @@ class postController {
        const post = await postServices.updatePost(id, req.body)  
         res.send(post)
     }
-
-
+    
     //delete a post
     deletePost = async (req: Request<{id: string}>, res: Response) => {
         const id = req.params.id
         await postServices.deletePost(id)
         res.send('post deleted')
     }
-
 }
 
 //export class

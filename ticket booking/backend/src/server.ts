@@ -1,4 +1,5 @@
 import express from 'express'
+import { Request, Response,NextFunction } from 'express'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -19,7 +20,8 @@ app.use(express.urlencoded({extended: true}))
 app.use('/api/v1/posts', router)
 app.use('/api/v1/events', eventRouter)
 
-//db connection then server connection
-
 app.listen(process.env.PORT ||3000, () => console.log('Server is listening on port 3000'))
 
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {      
+  res.status(500).json({succes:false,message:err.message,data:[]})
+})

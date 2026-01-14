@@ -7,13 +7,17 @@ const rowSchema = new Schema({
      },
     totalSeats:{
         type:Number
-    } 
+    }, 
+    bookedSeats:{
+        type:Number,
+        default:0 ;/////////////////
+    }
 });
 const sectionSchema = new Schema({
      name: {
         type:String
      },
-    totalSeats:[rowSchema]
+    rows:[rowSchema]
 });
 //Postschema
 const eventSchema = new Schema<IEvent>({

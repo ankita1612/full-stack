@@ -12,10 +12,10 @@ eventRouter.post('/',EventController.addEvent)
  eventRouter.get('/', EventController.getEvents)
 
 // //get single post
-// router.get('/:id', PostController.getAPost)
+eventRouter.get('/:id/:name', EventController.getEvent)
 
 // //update a post
-// router.put('/:id', PostController.updatePost)
+ eventRouter.post('/book-ticket', EventController.bookTicket)
 
 // //delete a post
-// router.delete('/:id', PostController.deletePost)
+ eventRouter.delete('/:id', EventController.deleteEvent)
