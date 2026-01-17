@@ -10,7 +10,7 @@ const rowSchema = new Schema({
     }, 
     bookedSeats:{
         type:Number,
-        default:0 ;/////////////////
+        default:0 
     }
 });
 const sectionSchema = new Schema({
