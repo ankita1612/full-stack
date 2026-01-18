@@ -6,7 +6,7 @@ export class AuthServices {
   async registration(data: IUser ): Promise<IUser | null | String> {
     const result  = await User.findOne({"email":data.email})
     if(result){
-        throw new Error("user with email already exist")
+        throw new Error("USER_ALREADY_EXISTS")
     }
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
@@ -22,13 +22,13 @@ export class AuthServices {
   async login(data: IUser ): Promise<ILoginResponse | null | String> {
     const result  = await User.findOne({"email":data.email})
     if(!result){
-        throw new Error("user not exist")
+        throw new Error("USER_NOT_EXISTS")
     }
     const passwordMatched = await bcrypt.compare(data.password, result.password );
     if(!passwordMatched){
-        throw new Error("invalid password")
+        throw new Error("INVALID_PASSWORD")
     }
-    let token = await jwt.sign({"_id":result._id},process.env.SECRET_KEY||"")
+    let token = jwt.sign({"_id":result._id},process.env.SECRET_KEY||"")
 
     const userObj = result.toObject();
    // delete (userObj as any).password;

@@ -1,7 +1,6 @@
 //import modules
-import { postServices } from '../services/post.service'
+import { postService } from '../services/post.service'
 import { Request, Response } from 'express'
-import {PostschemaValidate} from '../models/post.model'
 
 class postController {
     //add post controller
@@ -12,24 +11,17 @@ class postController {
             author: req.body.author,
             description: req.body.description,
             published: req.body.published
-        }
-        //validating the request
-        const {error, value} = PostschemaValidate.validate(data)
-
-        if(error){
-            res.send(error.message)
-
-        }else{
-            //call the create post function in the service and pass the data from the request
-            const post = await postServices.createPost(value)
-            res.status(201).send(post)          
-        }
+        }    
+        //call the create post function in the service and pass the data from the request
+        const post = await postService.createPost(data)
+        res.status(201).send(post)          
+        
         
     }
 
     //get all posts
     getPosts = async (req: Request, res: Response) => {
-        const posts = await postServices.getPosts()
+        const posts = await postService.getPosts()
         res.send(posts)
     }
 
@@ -38,22 +30,33 @@ class postController {
     getAPost = async (req: Request<{id: string}>, res: Response) => {
         //get id from the parameter
         const id = req.params.id 
-        const post = await postServices.getPost(id)
+        const post = await postService.getPost(id)
         res.send(post)
     }
 
     //update post
     updatePost = async (req: Request<{id: string}>, res: Response) => {
-        const id = req.params.id
-       const post = await postServices.updatePost(id, req.body)  
-        res.send(post)
+       const id = req.params.id
+       const post = await postService.updatePost(id, req.body)  
+       if (!post) {
+            return res.status(404).json({ message: 'Post not found' });
+       }
+       res.send(post)
     }
     
     //delete a post
     deletePost = async (req: Request<{id: string}>, res: Response) => {
-        const id = req.params.id
-        await postServices.deletePost(id)
-        res.send('post deleted')
+        try {
+            const deleted = await postService.deletePost(req.params.id);
+
+            if (!deleted) {
+            return res.status(404).json({ message: 'Post not found' });
+            }
+
+            return res.status(200).json({ message: 'Post deleted' });
+        } catch (error) {
+            return res.status(400).json({ message: 'Invalid post id' });
+        }
     }
 }
 

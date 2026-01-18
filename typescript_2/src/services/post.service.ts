@@ -19,47 +19,23 @@ export class PostService {
     return Post.find();
   }
 
-  async getPost(id: string): Promise<IPost> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new Error("Invalid post id");
-    }
-
+  async getPost(id: string): Promise<IPost | null> {   
     const post = await Post.findById(id);
-    if (!post) {
-      throw new Error("Post not found");
-    }
-
     return post;
   }
 
-  // update post
-  async updatePost(id: string, data: Partial<IPost>): Promise<IPost> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new Error("Invalid post id");
-    }
-
+  async updatePost(id: string, data: Partial<IPost>): Promise<IPost | null> {
     const post = await Post.findByIdAndUpdate(id, data, {
       new: true,
       runValidators: true,
-    });
-
-    if (!post) {
-      throw new Error("Post not found");
-    }
-
+    });   
     return post;
   }
 
   // delete post
-  async deletePost(id: string): Promise<void> {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new Error("Invalid post id");
-    }
-
+  async deletePost(id: string): Promise<IPost | null> {
     const post = await Post.findByIdAndDelete(id);
-    if (!post) {
-      throw new Error("Post not found");
-    }
+    return post
   }
   async testPost(id: string): Promise<IPost | null> {
     const objectId = new Types.ObjectId(id);
@@ -69,4 +45,4 @@ export class PostService {
 }
 
 // singleton export
-export const postServices = new PostService();
+export const postService = new PostService();

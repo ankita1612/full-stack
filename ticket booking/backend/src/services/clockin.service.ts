@@ -1,5 +1,6 @@
 import Clockin from '../models/clockin.model'
 import IClockin from '../interface/clockin.interface'
+import IEmployee from "../interface/employee.interface"
 import  Employee  from '../models/employee.model'
 import mongoose,{Types} from "mongoose";
 
@@ -110,7 +111,7 @@ export class clockinService {
     async missingClockin(id: string) {
       
     }
-    async filterClockin(){
+    async filterClockin(){        
         const result =await Clockin.find().sort({emp_id:"desc"}).populate("emp_id")
         const new_data=result.filter((a)=>{
             if(a.clockin=="10:10" && a.emp_id._id.toString()=="696a2adf16e4ffcab92d3cd4")
@@ -119,35 +120,48 @@ export class clockinService {
         return new_data
     }
     async reducerClockin( ){
-        return "reducerClockin"
+        const data = await Clockin.find().populate("emp_id").sort({emp_id:1});
+     //   return data;
+
+        const new_data = data.reduce<Record<string, IClockin[]>>((acc, s) => {           
+            if(acc[s.clockin] == undefined)
+                acc[s.clockin]=[]
+            else
+                acc[s.clockin].push(s)
+            return acc;
+        }, {});
+        return new_data
     }
-    async mapClockin( ){
-        // const result =await Clockin.find().sort({emp_id:"desc"}).populate("emp_id", "name").lean()
-        // const new_data = result.map((s)=>{
-           
-        //     const emp_id1=s.emp_id
-        //     return {id:s.emp_id._id, id1:emp_id1 , name:emp_id1.name}
-        // })
-        const data = await Clockin.find().populate("emp_id", "name").lean();
+    async mapClockin( ){        
+        const data = await Clockin.find().populate("emp_id").sort({emp_id:1});
 
         const new_data = data.map((s: IClockin) => {
-            if (typeof s.emp_id === "string" || s.emp_id instanceof Types.ObjectId) {
-                return null; // or handle non-populated case
-            }
+              const emp = s.emp_id as IEmployee;;  //to read emp.name it is compalsory
 
-            return {
-                id: s.emp_id._id,
-                name: s.emp_id.name
-            };
+            //  if (typeof s.emp_id === "string" || s.emp_id instanceof Types.ObjectId) {
+            //      return null; 
+            //  }
+            return {id: emp._id, name: emp.name};
             });
         return new_data;
     }
     async foreachClockin(){
-        return "foreachClockin"
-    }
+        const data = await Clockin.find().populate("emp_id").sort({emp_id:1});
+        const new_data: { id: string; name: string }[] = [];
 
+        data.forEach((s) => {
+            const emp = s.emp_id as IEmployee;
+            if(emp._id=="696a2adf16e4ffcab92d3cd3" && emp.name=="jenil")
+            {
+                new_data.push({
+                    id: emp._id.toString(),
+                    name: emp.name
+                });
+            }            
+        });
+        return new_data;
+    }
 }
 
-//export the class
 const clockinServices = new clockinService()
 export default clockinServices

@@ -4,6 +4,6 @@ export default interface IPost {
   description: string;
   author: string;
   published: boolean;
-  skills:[string]
+  skills:string[];
 }
 

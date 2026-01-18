@@ -1,73 +1,26 @@
-//import module
-import { Post, } from '../models/post.model'
-import IPosts from '../interface/post.interface'
+import Post  from '../models/post.model';
+import IPosts from '../interface/post.interface';
 
-export class postService {
-    //create a post
-    async createPost(data: IPosts) {
-        try {
-            const newPost = await Post.create(data)
-            return newPost
+export class PostService {
+  async createPost(data: IPosts): Promise<IPosts> {
+    return Post.create(data);
+  }
 
-        } catch (error) {
-            console.log(error)
-        }
-    }
+  async getPosts(): Promise<IPosts[] | null> {
+    return Post.find({});
+  }
 
-    //get all posts
-    async getPosts() {
-        try {
-            const posts = await Post.find({})
-            return posts
+  async getPost(id: string): Promise<IPosts | null> {
+    return Post.findById(id);
+  }
 
-        } catch (error) {
-            console.log(error)
-        }
-    }
+  async updatePost(id: string,data: Partial<IPosts>): Promise<IPosts | null> {
+    return Post.findByIdAndUpdate(id, data, { new: true });
+  }
 
-    //get a single post
-    async getPost(id: string) {
-      
-        try {
-            const post = await Post.findById({_id:id})
-            if (!post) {
-                return 'post not available'
-            }
-            return post
-
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    //update a post
-    async updatePost(id: string, data: any) {
-        try {
-                //pass the id of the object you want to update
-                //data is for the new body you are updating the old one with
-                //new:true, so the dats being returned, is the update one
-                const postz = await Post.findByIdAndUpdate({_id:id}, data, {new: true})                
-                if(!postz){
-                    return "post not available"
-                }
-                return postz          
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    //delete a post by using the find by id and delete 
-    async deletePost(id: string) {
-        try {
-            const post = await Post.findByIdAndDelete(id)
-            if (!post) {
-                return 'post not available'
-            }
-        } catch (error) {
-            console.log(error)
-        }
-    }
+  async deletePost(id: string): Promise<IPosts | null> {
+    return Post.findByIdAndDelete(id);
+  }
 }
 
-//export the class
-export const postServices = new postService()
+export const postService = new PostService();

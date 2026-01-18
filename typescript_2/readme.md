@@ -19,3 +19,40 @@ in production
 1)To make build : npx tsc
 2)it create dist folder in root
 3)node dist/server.js to run application
+
+++++++++++++++++++++++jest+++++++++++++++++
+
+1.  npm install -D jest ts-jest @types/jest
+    npm install mongodb-memory-server
+2.  tsconfig.json File data
+    {
+    "compilerOptions": {
+    "types": ["node", "jest"]
+    }
+    }
+3.  run : npx ts-jest config:init
+    jest.config.ts file data
+    import type { Config } from 'jest';
+
+        const config: Config = {
+          preset: 'ts-jest',
+          testEnvironment: 'node',
+          testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+        };
+
+        export default config;
+
+4.  Add test script in package.json
+    {
+    "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+    }
+    }
+5.  Create your first test.Example project structure
+    src/
+    ├─ user.service.ts
+    └─ user.service.test.ts
+6.  Run all test : npm test
+    Run only specific file:npx jest post.service.test.ts

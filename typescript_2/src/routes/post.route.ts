@@ -1,14 +1,14 @@
 import express from "express";
 import { postController } from '../controllers/post.controller'
 import { validateAdd, isRequestValidated,validateEdit } from '../validations/post.validations'
-const router = express.Router()
+const postRouter = express.Router()
 
-router.post('/',validateAdd,isRequestValidated, postController.addPost)
-router.get('/',postController.getPosts)
-router.get('/:id', postController.getPost)
-router.put('/:id', validateEdit, isRequestValidated, postController.updatePost)
-router.delete('/:id', postController.deletePost)
-router.post('/test', postController.testPost)
+postRouter.post('/',validateAdd,isRequestValidated, postController.addPost)
+postRouter.get('/',postController.getPosts)
+postRouter.get('/:id', postController.getPost)
+postRouter.put('/:id', validateEdit, isRequestValidated, postController.updatePost)
+postRouter.delete('/:id', postController.deletePost)
+postRouter.post('/test', postController.testPost)
 
 
-export default router;
+export default postRouter;

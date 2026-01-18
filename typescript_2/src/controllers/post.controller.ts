@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { postServices } from "../services/post.service";
 import  IPost  from "../interface/post.interface";
+import { Types } from "mongoose";
 
 class PostController {
   addPost = async (req: Request<{}, {}, IPost>, res: Response, next: NextFunction): Promise<void> => {
@@ -13,7 +14,7 @@ class PostController {
   };
 
   getPosts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    try {
+    try {     
       const posts = await postServices.getPosts();
       res.status(201).json({"success":true,"message":"","data":posts});
     } catch (error) {
@@ -23,16 +24,34 @@ class PostController {
 
   getPost = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const post = await postServices.getPost(req.params.id);
-      res.status(201).json({"success":true,"message":"","data":post});
+      const { id } = req.params;
+      if (!Types.ObjectId.isValid(id)) {
+        res.status(422).json({ message: 'Invalid post id' });
+      }
+
+      const post = await postServices.getPost(id);
+
+      if (!post) {
+        res.status(404).json({ message: 'Post not found' });
+      }
+
+      res.status(200).json({success: true,data: post,});
     } catch (error) {
-      next(error);
+      next(error); // handled by global error middleware
     }
-  };
+};
 
   updatePost = async (req: Request<{ id: string }, {}, Partial<IPost>>, res: Response, next: NextFunction): Promise<void> => {
     try {
+      if (!Types.ObjectId.isValid(req.params.id)) {
+        res.status(422).json({ message: 'Invalid post id' });
+      }
       const post = await postServices.updatePost(req.params.id, req.body);
+
+      if (!post) {
+        res.status(404).json({ message: 'Post not found' });
+      }
+
       res.status(201).json({"success":true,"message":"Post update successfully","data":post});
     } catch (error) {
       next(error);
@@ -41,7 +60,13 @@ class PostController {
 
   deletePost = async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
     try {
-      await postServices.deletePost(req.params.id);
+      if (!Types.ObjectId.isValid(req.params.id)) {
+        res.status(422).json({ message: 'Invalid post id' });
+      }
+      const post = await postServices.deletePost(req.params.id);
+      if (!post) {
+        res.status(404).json({ message: 'Post not found' });
+      }
       res.status(201).json({"success":true,"message":"post delete successfully","data":[]});
     } catch (error) {
       next(error);
