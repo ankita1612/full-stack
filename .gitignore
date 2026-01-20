@@ -2,3 +2,5 @@ typescript_2/node_modules/*
 typescript_2/dist/*
 ticket booking/backend/node_modules/*
 post with jest/node_modules/*
+authentication_ts/backend/node_modules/*
+authentication_ts/frontend/node_modules/*

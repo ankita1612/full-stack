@@ -15,10 +15,9 @@ const userSchema = new Schema<IUser>({
         type: Date,
     },
      status: {
-    type: String,
-    enum: Object.values(Status), 
-    default: Status.ACTIVE,
-    required: true,
+        type: String,
+        enum: Object.values(Status), 
+        default: Status.ACTIVE,
   }, 
     profile_image :{
         type: String,
