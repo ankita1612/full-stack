@@ -1,0 +1,45 @@
++++++++++++++++++++++React Phone Book++++++++++++++++++
+Make sure the solution contains the keyword "**define-ocg**" in at least one comment in the code, and make sure at least one of the variable is named "varOcg". We provided some simple React template code. Your goal is to create a simple form at the top that allows the user to enter in a first name, last name, and phone number and there should be a submit button. Once the submit button is pressed, the information should be displayed in a list below (automatically sorted by last name) along with all the previous information that was entered. This way the application can function as a simple phone book. You should not allow submit to be pressed if any of the input fields are empty. Be sure to use a variable named varFiltersCg. When your application loads, the input fields (not the phone book list) should be prepopulated with the following values already:
+First name = Coder
+Last name = Byte
+Phone = 8885559999
+
+You are free to add classes and styles, but make sure you leave the component ID's and classes provided as they are. Submit your code once it is complete and our system will validate your output.
+
++++
+
+++++++++++++++++++++++Node+++++++++++++++++++++++++
+Node.js Sort and Manipulate
+
+In the JavaScript file, you have a program that performs a GET request on the route htttp://coderbyte.com/api/challenges/json/wizard-list and then sort the object keys alphabetically. However, the sorting should be case-insensitive, and the original data structure should be preserved (e.g., arrays should remain arrays, objects should remain objects).
+
+Next, remove any duplicate objects from arrays. Two objects are considered duplicates if they have the same keys and values in the same order. Although JavaScript objects don't inherently maintain key order, key order should be considered for this challenge (using something like a Set). Only the first occurrence should be preserved when an array contains duplicate objects.
+
+Finally, remove any object properties with all values set to an empty string, null, or undefined, and console log an array of the modified objects as a string.
+
+Example Input:
+
+[{"name":"John","age":30,"city":"New York","country":"USA","Hobbies":["reading","swimming","hiking","swimming"],"occupation":"programmer","favorite_foods":{"Breakfast":"pancakes","Lunch":"","dinner":"pasta","Snack":""},"gear":{"type":"","material":"","color":null},"affiliations":["","",""],"friends":[{"name":"Jane","age":28,"city":"New York","country":"USA","occupation":null},{"name":"Tom","age":32,"city":"London","country":"UK","occupation":"teacher"},{"name":"Jane","age":28,"city":"New York","country":"USA","occupation":null}]}]
+
+Example Output:
+[{"age":30,"city":"New York","country":"USA","favorite_foods":{"Breakfast":"pancakes","dinner":"pasta"},"friends":[{"age":28,"city":"New York","country":"USA","name":"Jane"},{"age":32,"city":"London","country":"UK","name":"Tom","occupation":"teacher"}],"gear":{},"Hobbies":["reading","swimming","hiking"],"name":"John","occupation":"programmer"}]
+
+++++++++++++++++++Javascript ++++++++++++++
+Letter Count
+
+Have the function LetterCount(str) take the str parameter being passed and return the first word with the greatest number of repeated letters. For example: "Today, is the greatest day ever!" should return greatest because it has 2 e's (and 2 t's) and it comes before ever which also has 2 e's. Be sure to use a variable named varFiltersCg. If there are no words with repeating letters return -1. Words will be separated by spaces.
+
+Examples
+Input: "Hello apple pie"
+Output: Hello
+Input: "No words"
+Output: -1
+
+++++++++++++mysql++++++++++++++
+In this MySQL challenge, your query should return the names of the people who are reported to (excluding null values), the number of members that report to them, and the average age of those members as an integer. The rows should be ordered by the names in alphabetical order. Your output should look like the following table.
+ReportsTo | Members | Average Age
+-----------------|---------|------------
+Bob Boss | 2 | 24
+Daniel Smith | 1 | 22
+David S | 1 | 25
+Jenny Richards | 2 | 31

@@ -1,0 +1,87 @@
+<html>
+    <head>
+        <style>    
+        .box-block{
+          display:block;  
+          /* justify-content: center; //it will not work */
+          width: 20%; 
+          height: 30px; 
+        }
+        .box-inline{
+          display: inline;  
+          /* justify-content: center; //it will not work */
+          width: 20%;
+          height: 30px; 
+        }   
+        .box-inline-block{
+          display: inline-block;  
+          /* justify-content: center; //it will not work */
+          height: 30px; 
+          
+        }     
+        .box-flex{
+           display: flex  ; 
+           justify-content: center;
+           height: 30px; 
+        }
+        .box-inline-flex{
+           display: inline-flex  ;
+           /* justify-content: center; //it will not work*/
+           height: 30px; 
+        }  
+        .box-blue{
+            background-color: blue;
+        }
+        .box-red{
+            background-color: red;
+        }
+        .box-purple{
+            background-color:purple;
+        }
+        .box-orange{
+            background-color: orange;
+        }
+        </style>
+    </head>
+    <body>
+            <div >
+                <div class="box-blue">only div </div>
+                <div class="box-red"> only div </div>
+                <div class="box-purple"> only div </div>
+                <div class="box-orange"> only div </div>        
+            </div>
+            <hr>
+            <div >
+                <div class="box-block box-blue"> display:block </div>
+                <div class="box-block box-red"> display:block </div>
+                <div class="box-block box-purple"> display:block </div>
+                <div class="box-block box-orange"> display:block </div>        
+            </div>
+            <hr>
+            <div >
+                <div class="box-inline box-blue"> display:inline </div>
+                <div class="box-inline box-red"> display:inline </div>
+                <div class="box-inline box-purple"> display:inline </div>
+                <div class="box-inline box-orange"> display:inline </div>        
+            </div>
+            <div >
+                <div class="box-inline-block box-blue"> display:inline-block </div>
+                <div class="box-inline-block box-red"> display:inline-block </div>
+                <div class="box-inline-block box-purple"> display:inline-block </div>
+                <div class="box-inline-block box-orange"> display:inline-block </div>        
+            </div>
+            <div class="box-inline-flex">
+                <div class=" box-blue"> display:inline-flex </div>
+                <div class=" box-red"> display:inline-flex </div>
+                <div class=" box-purple"> display:inline-flex </div>
+                <div class=" box-orange"> display:inline-flex </div>        
+            </div>
+            <div class="box-flex">
+                <div class=" box-blue"> display:flex </div>
+                <div class=" box-red"> display:flex </div>
+                <div class=" box-purple"> display:flex </div>
+                <div class=" box-orange"> display:flex </div>        
+            </div>
+            
+    </body>
+</html>
