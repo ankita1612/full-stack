@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { Grid, Card } from "@mui/material";
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+} from "@mui/material";
 import PropertyForm from "./ProperyForm";
 import { PropertyRow } from "./PropertyRow";
 import type { Property } from "../../types/Property";
@@ -40,20 +46,25 @@ export default function PropertyCRUD() {
     <>
       <PropertyForm onSave={saveProperty} editData={editData} />
 
-      <Grid container spacing={2}>
-        {properties.map((prop) => (
-          <Grid size={{ xs: 12, sm: 12, md: 12 }} key={prop.id}>
-            <Card>
-              <PropertyRow
-                key={prop.id}
-                property={prop}
-                onDelete={deleteProperty}
-                onEdit={editProperty}
-              />
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Name</TableCell>
+            <TableCell>Description</TableCell>
+            <TableCell>Action</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {properties.map((prop) => (
+            <PropertyRow
+              key={prop.id}
+              property={prop}
+              onDelete={deleteProperty}
+              onEdit={editProperty}
+            />
+          ))}
+        </TableBody>
+      </Table>
     </>
   );
 }
