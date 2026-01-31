@@ -1,26 +1,30 @@
 import { Button } from '@mui/material'
 import './App.css'
-import MuiTypography from './assets/MuiTypography'
-import ShowButtons from './assets/ShowButtons'
-import TextInput from './assets/TextInput'
-import IncrDecr from "./assets/IncrDecr"
-import UsestateWithArr from "./assets/UsestateWithArr" 
-import UsestateWithObject from "./assets/UsestateWithObject"
-import TimerEg from './assets/TimerEg'
-import TextBox from "./assets/TextBox"
-import MultiSelect from "./assets/MultiSelect"
-import Radio from "./assets/Radio"
-import MuiCheckbox from './assets/MuiCheckbox'
-import SwitchEg from './assets/SwitchEg'
-import RatingEg from './assets/RatingEg'
-import AutoCompleteEg from './assets/AutoCompleteEg'
-import BoxEg from './assets/BoxEg'
-import StackEg from './assets/StackEg'
-import GridEg from './assets/GridEg'
-import PaperEg from './assets/PaperEg' 
-import CardEg from './assets/CardEg'
-import AccordianEg from './assets/AccordianEg'
-import ImageListEg from './assets/ImageListEg'
+import MuiTypography from './components/MuiTypography'
+import ShowButtons from './components/ShowButtons'
+import TextInput from './components/TextInput'
+import IncrDecr from "./components/IncrDecr"
+import UsestateWithArr from "./components/UsestateWithArr" 
+import UsestateWithObject from "./components/UsestateWithObject"
+import TimerEg from './components/TimerEg'
+import TextBox from "./components/TextBox"
+import MultiSelect from "./components/MultiSelect"
+import Radio from "./components/Radio"
+import MuiCheckbox from './components/MuiCheckbox'
+import SwitchEg from './components/SwitchEg'
+import RatingEg from './components/RatingEg'
+import AutoCompleteEg from './components/AutoCompleteEg'
+import BoxEg from './components/BoxEg'
+import StackEg from './components/StackEg'
+import GridEg from './components/GridEg'
+import PaperEg from './components/PaperEg' 
+import CardEg from './components/CardEg'
+import AccordianEg from './components/AccordianEg'
+import ImageListEg from './components/ImageListEg'
+import TopHeader from './components/TopHeader'
+import PageBottom from './components/PageBottom'
+import ListEg from './components/ListEg'
+import ProgressbarEg from './components/ProgressbarEg'
 function App() {
   return (
     <>
@@ -44,10 +48,12 @@ function App() {
       {/* <PaperEg></PaperEg> */}
       {/* <CardEg></CardEg> */}
       {/* <AccordianEg></AccordianEg> */}
-      <ImageListEg></ImageListEg>
+      {/* <ImageListEg></ImageListEg> */}
+      {/* <TopHeader></TopHeader> */}
+      {/* <PageBottom></PageBottom> */}
+      {/* <ListEg></ListEg> */}
+      <ProgressbarEg></ProgressbarEg>
     </>
-
-
   )
 }
 
