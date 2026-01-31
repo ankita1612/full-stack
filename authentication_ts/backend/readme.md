@@ -3,9 +3,16 @@ https://medium.com/@rachealkuranchie/how-to-build-a-crud-api-with-express-js-and
 packages to install
 +++++++++++++++++++
 npm install cors dotenv express express-validator helmet mongoose @types/cors @types/dotenv @types/helmet @types/mongoose
+
 npm install bcrypt @types/bcrypt
+
 npm install jsonwebtoken @types/jsonwebtoken
+
 npm install multer @types/multer
+
+npm install typescript ts-node @types/node @types/express
+
+npx tsc --init
 
 To Run typescript in dev
 +++++++++++++++++++++++++++++++++++++

@@ -1,4 +1,8 @@
-1.  npm install react-hook-form yup @hookform/resolvers react-bootstrap bootstrap
+1.installation
+npm create vite@latest
+
+    npm install react-hook-form yup @hookform/resolvers react-bootstrap bootstrap
+
     npm install react-router-dom axios
 
 2.main.tsx
