@@ -4,3 +4,4 @@ ticket booking/backend/node_modules/*
 post with jest/node_modules/*
 authentication_ts/backend/node_modules/*
 authentication_ts/frontend/node_modules/*
+cart/backend/node_modules/*
