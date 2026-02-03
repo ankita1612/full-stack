@@ -27,7 +27,7 @@ const postSchema = new Schema<IPost>({
         type: Date,
         default: Date.now
 }
-
+//, { timestamps: true });
 })
  const Post = model<IPost>('Post', postSchema )
  export default Post

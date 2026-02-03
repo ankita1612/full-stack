@@ -20,6 +20,11 @@ function Header() {
                 <NavDropdown.Item href="/post/add">Add</NavDropdown.Item>
                 <NavDropdown.Divider />
               </NavDropdown>
+              <NavDropdown title="Employee" id="basic-nav-dropdown">
+                <NavDropdown.Item href="/employee/list">List</NavDropdown.Item>
+                <NavDropdown.Item href="/employee/add">Add</NavDropdown.Item>
+                <NavDropdown.Divider />
+              </NavDropdown>
             </Nav>
           </Navbar.Collapse>
         </Container>

@@ -4,11 +4,14 @@ dotenv.config();
 import connectDB from "./config/db.config";
 import postRouter from "./routes/post.route";
 import authRouter from "./routes/auth.route";
+import employeeRouter from "./routes/employee.route";
+import errorHandler from "./middleware/error.handler";
+
 
 import helmet from "helmet";
 import cors from "cors";
 import { Request, Response, NextFunction } from 'express'
-
+import path from "path"
 const app = express();
 
 // middlewares
@@ -20,23 +23,24 @@ app.use(express.urlencoded({ extended: true }));
 connectDB();
 app.use("/api/posts", postRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/employees", employeeRouter);
 
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(path.join(__dirname, '..', 'uploads')));
 
-// app.use("*", (req: Request, res: Response): void => {
-//   res.status(404).json({
-//     success: false,
-//     message: "Page not found",
-//   });
-// });
-
-
-app.use((err: any, req: Request, res: Response, next: NextFunction): void => {
-  res.status(500).json({
+//page not found
+app.use((req: Request, res: Response) => {
+  res.status(404).json({
     success: false,
-    message: err.message || "Internal Server Error",
-    data: [],
+    message: "Page not found",
   });
 });
+
+
+app.use(errorHandler);
 
 let server;
 const PORT = process.env.PORT || 3000;

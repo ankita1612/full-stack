@@ -20,18 +20,13 @@ const tagOptions = [
   "Religious",
   "Health",
 ];
-// yup schema
 const schema = yup.object().shape({
-  title: yup.string().required("Please add title"),
-  email: yup
-    .string()
-    .required("Please add email")
-    .email()
-    .required("valid email"),
-  description: yup.string().required("Please add description"),
-  author: yup.string().required("Please add author"),
-  published: yup.boolean().required("Please select published"),
-  option_type: yup.string().required("Please select option type"),
+  title: yup.string().required("Title is required"),
+  email: yup.string().email("Enter valid email").required("Email required"),
+  description: yup.string().required("Description is required"),
+  author: yup.string().required("Author is required"),
+  published: yup.boolean().required("Published is required"),
+  option_type: yup.string().required("Option type is required"),
   skills: yup
     .array()
     .of(yup.string().required())
@@ -44,36 +39,41 @@ const schema = yup.object().shape({
     .required("Tags are required"),
 });
 
-const PostAdd: React.FC = () => {
+function PostAdd() {
   const { id } = useParams();
   const [mode, setMode] = useState("add");
   let navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [msg, setMsg] = useState("");
+  const [msgType, setMsgType] = useState<"success" | "error" | "">("");
+  useEffect(() => {
+    if (id) setMode("edit");
+  }, [id]);
 
   useEffect(() => {
-    if (id) {
-      setMode("edit");
-      const fetchPost = async () => {
-        try {
-          const response = await axios.get(BACKEND_URL + "/api/posts/" + id);
-          setValue("title", response.data.data.title);
-          setValue("email", response.data.data.email);
-          setValue("description", response.data.data.description);
-          setValue("author", response.data.data.author);
-          setValue("published", response.data.data.published.toString());
-          setValue("option_type", response.data.data.option_type);
-          setValue("tags", response.data.data.tags);
-          setValue("skills", response.data.data.skills);
-        } catch (error: any) {
-          if (error.status == 422) {
-            setMsg(error?.response?.data?.message);
-            setMsgType("error");
-            // navigate("post/list");
-          }
-        }
-      };
-      fetchPost();
-    }
-  }, []);
+    if (!id) return;
+    let mounted = true;
+
+    const fetchPost = async () => {
+      setLoading(true);
+      try {
+        const { data } = await axios.get(`${BACKEND_URL}/api/posts/${id}`);
+        Object.entries(data.data).forEach(([k, v]) =>
+          setValue(k as keyof IPost, v),
+        );
+      } catch {
+        setMsg("Failed to load post");
+        setMsgType("error");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+    return () => {
+      mounted = false;
+    };
+  }, [id]);
   const {
     register,
     handleSubmit,
@@ -91,9 +91,6 @@ const PostAdd: React.FC = () => {
   const formValues = watch();
   console.log(formValues);
 
-  const [msg, setMsg] = useState("");
-  const [msgType, setMsgType] = useState("");
-
   useEffect(() => {
     if (msg) {
       const timer = setTimeout(() => {
@@ -103,6 +100,7 @@ const PostAdd: React.FC = () => {
     }
   }, [msg]);
   const onSubmit = async (data: IPost) => {
+    setLoading(true);
     try {
       const send_data = {
         title: data.title,
@@ -114,25 +112,21 @@ const PostAdd: React.FC = () => {
         tags: data.tags,
         skills: data.skills,
       };
-      let response: any;
+      let res: any;
       if (mode == "add") {
-        response = await axios.post(BACKEND_URL + "/api/posts", send_data);
+        res = await axios.post(BACKEND_URL + "/api/posts", send_data);
       } else {
-        response = await axios.put(BACKEND_URL + "/api/posts/" + id, send_data);
+        res = await axios.put(BACKEND_URL + "/api/posts/" + id, send_data);
       }
 
-      if (response?.status === 201) {
-        setMsg(response.data.message);
-        setMsgType("success");
-        navigate("/post/list", {
-          state: { msg: response?.data?.message, type: "success" },
-        });
-      }
+      navigate("/post/list", {
+        state: { msg: res.data.message, type: "success" },
+      });
     } catch (error: any) {
-      if (error.status == 422) {
-        setMsg(error?.response?.data?.message);
-        setMsgType("error");
-      }
+      setMsg(error.response?.data?.message || "Request failed");
+      setMsgType("error");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -158,7 +152,6 @@ const PostAdd: React.FC = () => {
             <Form.Control
               type="text"
               placeholder="title"
-              name="title"
               {...register("title")}
               isInvalid={!!errors.title}
             />
@@ -172,15 +165,14 @@ const PostAdd: React.FC = () => {
           <Form.Group as={Col} md="4">
             <Form.Label>Email</Form.Label>
             <Form.Control
-              type="text"
+              type="email"
               placeholder="email"
-              name="email"
               {...register("email")}
               isInvalid={!!errors.email}
             />
 
             <Form.Control.Feedback type="invalid">
-              {errors.email && <p>{errors.email.message}</p>}
+              {errors.email?.message}
             </Form.Control.Feedback>
           </Form.Group>
         </Row>
@@ -208,12 +200,11 @@ const PostAdd: React.FC = () => {
             <Form.Control
               type="text"
               placeholder="author"
-              name="author"
               {...register("author")}
               isInvalid={!!errors.author}
             />
             <Form.Control.Feedback type="invalid">
-              {errors.author && <p>{errors.author.message}</p>}
+              {errors.author?.message}
             </Form.Control.Feedback>
           </Form.Group>
         </Row>
@@ -226,7 +217,9 @@ const PostAdd: React.FC = () => {
               id="published-yes"
               label="Yes"
               value="true"
-              {...register("published")}
+              {...register("published", {
+                setValueAs: (v: string) => v === "true",
+              })}
               isInvalid={!!errors.published}
             />
 
@@ -235,11 +228,16 @@ const PostAdd: React.FC = () => {
               id="published-no"
               label="No"
               value="false"
-              {...register("published")}
+              {...register("published", {
+                setValueAs: (v: string) => v === "true",
+              })}
               isInvalid={!!errors.published}
             />
+
             {errors.published && (
-              <div className="text-danger mt-1">{errors.published.message}</div>
+              <Form.Control.Feedback type="invalid" className="d-block">
+                {errors.published.message}
+              </Form.Control.Feedback>
             )}
           </Form.Group>
         </Row>
@@ -249,11 +247,12 @@ const PostAdd: React.FC = () => {
             <Form.Select
               {...register("option_type")}
               isInvalid={!!errors.option_type}
+              aria-invalid={!!errors.option_type}
             >
               <option value="">-- Select Option Type --</option>
               <option value="AB">AB</option>
               <option value="BC">BC</option>
-              <option value="CE">CD</option>
+              <option value="CD">CD</option>
               <option value="DE">DE</option>
             </Form.Select>
 
@@ -278,7 +277,6 @@ const PostAdd: React.FC = () => {
                 setValue("skills", values, { shouldValidate: true });
               }}
             >
-              <option value="">-- Select skills --</option>
               <option value="cricket">Cricket</option>
               <option value="badminton">Badminton</option>
               <option value="a">a</option>
@@ -311,8 +309,8 @@ const PostAdd: React.FC = () => {
           </Form.Group>
         </Row>
         <div className="mt-3 d-flex gap-2">
-          <Button type="submit" variant="primary">
-            Save
+          <Button type="submit" disabled={loading}>
+            {loading ? "Saving..." : "Save"}
           </Button>
           <Button
             type="button"
@@ -325,5 +323,5 @@ const PostAdd: React.FC = () => {
       </Form>
     </Container>
   );
-};
+}
 export default PostAdd;
