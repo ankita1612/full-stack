@@ -29,7 +29,10 @@ describe('PostService CRUD with MongoDB', () => {
       description: 'Test description',
       author: 'Ankita',      
       published: false,
-      skills:['php','html']
+      option_type:"AB",
+      skills:['php','html'],
+      tags:['Suspense']
+
     });
     expect(post?._id).toBeDefined();
     post_created_id = post!._id;

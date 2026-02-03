@@ -15,8 +15,8 @@ const App = () => {
           <Route path="/" element={<Navigate to="/registration" />} />
           <Route path="/registration" element={<Registration />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/employee/add/:id?" element={<PostAdd />} />
-          <Route path="/employee/list" element={<PostList />} />
+          <Route path="/post/add/:id?" element={<PostAdd />} />
+          <Route path="/post/list" element={<PostList />} />
         </Routes>
       </Card.Body>
     </Card>

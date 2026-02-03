@@ -16,6 +16,7 @@ export const validateAdd = [
   body("author").notEmpty().withMessage("Author Name is required"),
   body("description").notEmpty().withMessage("Description is required"),
   body("published").notEmpty().withMessage("Published is required"),
+  body("option_type").notEmpty().withMessage("Option Type is required"),
   body("skills")
     .exists({ checkNull: true })
     .withMessage("Skills field is required")
@@ -40,11 +41,17 @@ export const validateEdit = [
   body("author").notEmpty().withMessage("Author Name is required"),
   body("description").notEmpty().withMessage("Description is required"),
   body("published").notEmpty().withMessage("Published is required"),
+  body("option_type").notEmpty().withMessage("Option Type is required"),
   body("skills")
     .exists({ checkNull: true })
     .withMessage("Skills field is required")
     .isArray({ min: 1 })
-    .withMessage("Skills must be an array with only 1 item")
+    .withMessage("Skills must be an array with only 1 item"),
+  body("tags")
+    .exists({ checkNull: true })
+    .withMessage("Tags field is required")
+    .isArray({ min: 1 })
+    .withMessage("Tags must be an array with only 1 item")
 ];
 export const isRequestValidated = (req: Request, res: Response, next: NextFunction): void => {
   const errors = validationResult(req);

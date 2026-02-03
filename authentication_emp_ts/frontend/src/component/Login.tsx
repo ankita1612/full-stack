@@ -44,7 +44,7 @@ const Login = () => {
       setServerMsg(result.data.message);
       setServerMsgType("success");
       localStorage.setItem("user_data", JSON.stringify(user_data));
-      // navigate("/employee");
+      navigate("/post/list");
     } catch (error: any) {
       setServerMsg(error.response?.data?.message || "Server Error");
       setServerMsgType("fail");

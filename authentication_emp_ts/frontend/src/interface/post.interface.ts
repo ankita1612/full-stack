@@ -5,5 +5,8 @@ export interface IPost {
   description: string;
   author: string;
   published: boolean;
+  option_type: string;
   skills: string[];
+  tags: string[];
+  createdAt: Date;
 }

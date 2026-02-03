@@ -2,6 +2,7 @@ import Post from "../models/post.model";
 import  IPost  from "../interface/post.interface";
 
 import { Types } from "mongoose";
+import { get } from "http";
 
 export class PostService {
   async createPost(data: IPost): Promise<IPost> {
@@ -11,12 +12,15 @@ export class PostService {
       description: data.description,
       author: data.author,
       published: data.published,
-      skills:data.skills
+      option_type: data.option_type,
+      skills:data.skills,
+      tags:data.tags,
+      createdAt:new Date()
     });
   }
 
   async getPosts(): Promise<IPost[]> {
-    return Post.find();
+    return Post.find().sort({_id:-1});
   }
 
   async getPost(id: string): Promise<IPost | null> {   

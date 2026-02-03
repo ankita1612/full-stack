@@ -18,7 +18,16 @@ const postSchema = new Schema<IPost>({
         type: Boolean,
         default: false
     },   
-    skills :[String]
+    option_type: {
+        type: String,
+    },
+    skills :[String],
+    tags:[String],
+    createdAt: {
+        type: Date,
+        default: Date.now
+}
+
 })
  const Post = model<IPost>('Post', postSchema )
  export default Post
