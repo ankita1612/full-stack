@@ -1,4 +1,3 @@
-// validationSchema.ts
 import * as yup from "yup";
 
 const registrationValidate = yup.object({
@@ -28,6 +27,7 @@ const registrationValidate = yup.object({
 
   DOB: yup
     .date()
+    .typeError("Date of Birth is required")
     .required("Date of Birth is required")
     .max(new Date(), "DOB cannot be in the future"),
 });

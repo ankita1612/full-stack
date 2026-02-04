@@ -4,29 +4,40 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import type { loginInterface } from "../interface/login.interface";
 import loginValidate from "../validation/login.validation";
 import { Form, Button, Card, Container, Alert } from "react-bootstrap";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import axios from "axios";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   let navigate = useNavigate();
-  const [serverMsg, setServerMsg] = useState("");
-  const [serverMsgType, setServerMsgType] = useState("");
+  const [msg, setMsg] = useState("");
+  const [msgType, setMsgType] = useState<"success" | "danger" | "">("");
+  const location = useLocation();
+  const { login } = useAuth();
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<loginInterface>({ resolver: yupResolver(loginValidate) });
 
+  // Message from navigation
   useEffect(() => {
-    if (!serverMsg) return;
+    if (location.state?.msg) {
+      setMsg(location.state.msg);
+      setMsgType(location.state.type);
+    }
+  }, [location.state]);
 
-    const timer = setTimeout(() => {
-      setServerMsg("");
-    }, 5000);
-
-    return () => clearTimeout(timer);
-  }, [serverMsg]);
+  useEffect(() => {
+    if (msg) {
+      const timer = setTimeout(() => {
+        setMsg("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [msg]);
 
   const onSubmit = async (data: loginInterface) => {
     try {
@@ -35,19 +46,26 @@ const Login = () => {
         password: data.password,
       };
 
-      const result = await axios.post(BACKEND_URL + "api/auth/login", userData);
+      const result = await axios.post(
+        BACKEND_URL + "/api/auth/login",
+        userData,
+      );
       const user_data = {
-        name: result.data.data.user.name,
         token: result.data.data.token,
-        id: result.data.data.user._id,
+        user: {
+          username: result.data.data.user.name,
+          id: result.data.data.user._id,
+        },
       };
-      setServerMsg(result.data.message);
-      setServerMsgType("success");
-      localStorage.setItem("user_data", JSON.stringify(user_data));
+      //localStorage.setItem("user_data", JSON.stringify(user_data));
+
+      //context API
+      login(user_data.token, user_data.user);
+      //end context API
       navigate("/post/list");
     } catch (error: any) {
-      setServerMsg(error.response?.data?.message || "Server Error");
-      setServerMsgType("fail");
+      setMsg(error.response?.data?.message || "Login failed");
+      setMsgType("danger");
     }
   };
 
@@ -57,12 +75,12 @@ const Login = () => {
         <Card.Body>
           <Card.Title className="text-center mb-4">Login</Card.Title>
           <div>
-            {serverMsg && (
+            {msg && (
               <Alert
-                variant={serverMsgType === "success" ? "success" : "danger"}
-                className="mt-3"
+                variant={msgType === "success" ? "success" : "danger"}
+                className="text-center"
               >
-                {serverMsg}
+                {msg}
               </Alert>
             )}
           </div>
@@ -71,6 +89,7 @@ const Login = () => {
               <Form.Label>Email</Form.Label>
               <Form.Control
                 type="email"
+                autoFocus
                 {...register("email")}
                 isInvalid={!!errors.email}
               />
@@ -90,13 +109,8 @@ const Login = () => {
                 {errors.password?.message}
               </Form.Control.Feedback>
             </Form.Group>
-            <Button
-              variant="primary"
-              type="submit"
-              className="w-100"
-              disabled={isSubmitting}
-            >
-              Login
+            <Button type="submit" className="w-100" disabled={isSubmitting}>
+              {isSubmitting ? "Logging in..." : "Login"}
             </Button>
           </Form>
         </Card.Body>
@@ -104,5 +118,4 @@ const Login = () => {
     </Container>
   );
 };
-
 export default Login;

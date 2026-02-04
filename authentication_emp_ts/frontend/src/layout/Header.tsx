@@ -3,29 +3,72 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import Card from "react-bootstrap/Card";
+import logo from "../assets/images/1.png";
+import { useNavigate, NavLink } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+
 function Header() {
+  const navigate = useNavigate();
+  const { logout, user, loading } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login", {
+      state: { msg: "Logout successfully", type: "success" },
+    });
+  };
+
+  if (loading) return null; // wait until auth loads
+
   return (
-    <Card.Header>
-      <img src="images/1.png" alt="Logo" />
-      <Navbar expand="lg" className="bg-body-tertiary">
+    <Card.Header className="p-0">
+      <Navbar expand="lg" bg="light">
         <Container>
-          <Navbar.Brand href="#home">demo</Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
+          <Navbar.Brand as={NavLink} to="/">
+            <img src={logo} alt="Logo" height="30" className="me-2" />
+            Demo
+          </Navbar.Brand>
+
+          <Navbar.Toggle />
+          <Navbar.Collapse>
             <Nav className="me-auto">
-              <Nav.Link href="/login">Login</Nav.Link>
-              <Nav.Link href="/registration">Register</Nav.Link>
-              <NavDropdown title="post" id="basic-nav-dropdown">
-                <NavDropdown.Item href="/post/list">List</NavDropdown.Item>
-                <NavDropdown.Item href="/post/add">Add</NavDropdown.Item>
-                <NavDropdown.Divider />
-              </NavDropdown>
-              <NavDropdown title="Employee" id="basic-nav-dropdown">
-                <NavDropdown.Item href="/employee/list">List</NavDropdown.Item>
-                <NavDropdown.Item href="/employee/add">Add</NavDropdown.Item>
-                <NavDropdown.Divider />
-              </NavDropdown>
+              {!user ? (
+                <>
+                  <Nav.Link as={NavLink} to="/login">
+                    Login
+                  </Nav.Link>
+                  <Nav.Link as={NavLink} to="/registration">
+                    Register
+                  </Nav.Link>
+                </>
+              ) : (
+                <>
+                  <NavDropdown title="Post">
+                    <NavDropdown.Item as={NavLink} to="/post/list">
+                      List
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={NavLink} to="/post/add">
+                      Add
+                    </NavDropdown.Item>
+                  </NavDropdown>
+
+                  <NavDropdown title="Employee">
+                    <NavDropdown.Item as={NavLink} to="/employee/list">
+                      List
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={NavLink} to="/employee/add">
+                      Add
+                    </NavDropdown.Item>
+                  </NavDropdown>
+
+                  <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+                </>
+              )}
             </Nav>
+
+            <Navbar.Text>
+              {user ? `Welcome ${user.username}` : "Guest User"}
+            </Navbar.Text>
           </Navbar.Collapse>
         </Container>
       </Navbar>

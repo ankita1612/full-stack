@@ -10,8 +10,8 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Registration = () => {
   const navigate = useNavigate();
-  const [serverMsg, setServerMsg] = useState("");
-  const [serverMsgType, setServerMsgType] = useState("");
+  const [msg, setMsg] = useState("");
+  const [msgType, setMsgType] = useState<"success" | "danger" | "">("");
   const {
     register,
     handleSubmit,
@@ -21,25 +21,25 @@ const Registration = () => {
   });
 
   useEffect(() => {
-    if (!serverMsg) return;
+    if (!msg) return;
 
     const timer = setTimeout(() => {
-      setServerMsg("");
+      setMsg("");
     }, 5000);
 
     return () => clearTimeout(timer);
-  }, [serverMsg]);
+  }, [msg]);
 
   const onSubmit = async (data: registrationInterface) => {
     try {
       data.status = "active";
-      const result = await axios.post(BACKEND_URL + "api/auth/register", data);
-      setServerMsg(result.data.message);
-      setServerMsgType("success");
+      const result = await axios.post(BACKEND_URL + "/api/auth/register", data);
+      setMsg(result.data.message);
+      setMsgType("success");
       return navigate("/login");
     } catch (error: any) {
-      setServerMsg(error.response?.data?.message || "Server Error");
-      setServerMsgType("fail");
+      setMsg(error.response?.data?.message || "Server Error");
+      setMsgType("danger");
     }
   };
 
@@ -49,12 +49,12 @@ const Registration = () => {
         <Card.Body>
           <Card.Title className="text-center mb-4">Register</Card.Title>
           <div>
-            {serverMsg && (
+            {msg && (
               <Alert
-                variant={serverMsgType === "success" ? "success" : "danger"}
+                variant={msgType === "success" ? "success" : "danger"}
                 className="mt-3"
               >
-                {serverMsg}
+                {msg}
               </Alert>
             )}
           </div>
@@ -71,7 +71,6 @@ const Registration = () => {
               </Form.Control.Feedback>
             </Form.Group>
 
-            {/* Email */}
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
               <Form.Control
@@ -96,7 +95,6 @@ const Registration = () => {
               </Form.Control.Feedback>
             </Form.Group>
 
-            {/* Confirm Password */}
             <Form.Group className="mb-3">
               <Form.Label>Confirm Password</Form.Label>
               <Form.Control
@@ -113,7 +111,9 @@ const Registration = () => {
               <Form.Label>Date of Birth</Form.Label>
               <Form.Control
                 type="date"
-                {...register("DOB")}
+                {...register("DOB", {
+                  setValueAs: (value: Date) => (value ? new Date(value) : null),
+                })}
                 isInvalid={!!errors.DOB}
               />
               <Form.Control.Feedback type="invalid">

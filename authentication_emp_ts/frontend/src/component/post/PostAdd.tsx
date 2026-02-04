@@ -1,11 +1,11 @@
 import Button from "react-bootstrap/Button";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
+import Alert from "react-bootstrap/Alert";
+import Card from "react-bootstrap/Card";
 
-import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
-import Row from "react-bootstrap/Row";
 import Container from "react-bootstrap/Container";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -41,19 +41,25 @@ const schema = yup.object().shape({
 
 function PostAdd() {
   const { id } = useParams();
+  const topRef = useRef<HTMLHeadingElement>(null);
   const [mode, setMode] = useState("add");
   let navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
-  const [msgType, setMsgType] = useState<"success" | "error" | "">("");
+  const [msgType, setMsgType] = useState<"success" | "danger" | "">("");
+
   useEffect(() => {
     if (id) setMode("edit");
   }, [id]);
 
   useEffect(() => {
+    if (msg && msgType === "danger") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      requestAnimationFrame(() => topRef.current?.focus());
+    }
+  }, [msg, msgType]);
+  useEffect(() => {
     if (!id) return;
-    let mounted = true;
-
     const fetchPost = async () => {
       setLoading(true);
       try {
@@ -61,18 +67,21 @@ function PostAdd() {
         Object.entries(data.data).forEach(([k, v]) =>
           setValue(k as keyof IPost, v),
         );
-      } catch {
-        setMsg("Failed to load post");
-        setMsgType("error");
+        setValue("option_type", data.data.option_type);
+        setValue("published", data.data.published.toString());
+      } catch (error: any) {
+        setMsg(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Something went wrong",
+        );
+        setMsgType("danger");
       } finally {
         setLoading(false);
       }
     };
 
     fetchPost();
-    return () => {
-      mounted = false;
-    };
   }, [id]);
   const {
     register,
@@ -88,8 +97,8 @@ function PostAdd() {
       tags: [],
     },
   });
-  const formValues = watch();
-  console.log(formValues);
+  // const formValues = watch();
+  // console.log(formValues);
 
   useEffect(() => {
     if (msg) {
@@ -123,204 +132,197 @@ function PostAdd() {
         state: { msg: res.data.message, type: "success" },
       });
     } catch (error: any) {
-      setMsg(error.response?.data?.message || "Request failed");
-      setMsgType("error");
+      setMsg(
+        error?.response?.data?.message ||
+          error?.message ||
+          "Something went wrong",
+      );
+      setMsgType("danger");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      requestAnimationFrame(() => {
+        topRef.current?.focus();
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Container>
-      {msg && (
-        <div className="d-flex justify-content-center mt-3">
-          <div
-            className={`alert ${
-              msgType === "success" ? "alert-success" : "alert-danger"
-            } text-center`}
-            role="alert"
-            style={{ minWidth: "300px" }}
+    <Container className="d-flex justify-content-center mt-5">
+      <Card style={{ width: "500px" }}>
+        <Card.Body>
+          <Card.Title className="text-center mb-4" ref={topRef}>
+            Post
+          </Card.Title>
+
+          {msg && (
+            <Alert
+              variant={msgType === "success" ? "success" : "danger"}
+              className="text-center"
+            >
+              {msg}
+            </Alert>
+          )}
+
+          <Form
+            onSubmit={handleSubmit(onSubmit)}
+            className={loading ? "opacity-50" : ""}
           >
-            {msg}
-          </div>
-        </div>
-      )}
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <Row>
-          <Form.Group as={Col} md="4">
-            <Form.Label>Title</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="title"
-              {...register("title")}
-              isInvalid={!!errors.title}
-            />
-
-            <Form.Control.Feedback type="invalid">
-              {errors.title && <p>{errors.title.message}</p>}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Row>
-        <Row>
-          <Form.Group as={Col} md="4">
-            <Form.Label>Email</Form.Label>
-            <Form.Control
-              type="email"
-              placeholder="email"
-              {...register("email")}
-              isInvalid={!!errors.email}
-            />
-
-            <Form.Control.Feedback type="invalid">
-              {errors.email?.message}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Row>
-        <Row>
-          <Form.Group as={Col} md="4">
-            <Form.Label>Description</Form.Label>
-
-            <FloatingLabel controlId="floatingTextarea" label="Description">
+            <Form.Group className="mb-3">
+              <Form.Label>Title</Form.Label>
               <Form.Control
-                as="textarea"
-                placeholder="description"
-                {...register("description")}
-                isInvalid={!!errors.description}
+                autoFocus
+                type="text"
+                placeholder="Title"
+                {...register("title")}
+                isInvalid={!!errors.title}
               />
               <Form.Control.Feedback type="invalid">
-                {errors.description?.message}
+                {errors.title?.message}
               </Form.Control.Feedback>
-            </FloatingLabel>
-          </Form.Group>
-        </Row>
+            </Form.Group>
 
-        <Row>
-          <Form.Group as={Col} md="4">
-            <Form.Label>author</Form.Label>
-            <Form.Control
-              type="text"
-              placeholder="author"
-              {...register("author")}
-              isInvalid={!!errors.author}
-            />
-            <Form.Control.Feedback type="invalid">
-              {errors.author?.message}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Row>
-        <Row>
-          <Form.Group as={Col} md="4">
-            <Form.Label>Published</Form.Label>
-
-            <Form.Check
-              type="radio"
-              id="published-yes"
-              label="Yes"
-              value="true"
-              {...register("published", {
-                setValueAs: (v: string) => v === "true",
-              })}
-              isInvalid={!!errors.published}
-            />
-
-            <Form.Check
-              type="radio"
-              id="published-no"
-              label="No"
-              value="false"
-              {...register("published", {
-                setValueAs: (v: string) => v === "true",
-              })}
-              isInvalid={!!errors.published}
-            />
-
-            {errors.published && (
-              <Form.Control.Feedback type="invalid" className="d-block">
-                {errors.published.message}
-              </Form.Control.Feedback>
-            )}
-          </Form.Group>
-        </Row>
-        <Row>
-          <Form.Group as={Col} md="4">
-            <Form.Label>Option Type</Form.Label>
-            <Form.Select
-              {...register("option_type")}
-              isInvalid={!!errors.option_type}
-              aria-invalid={!!errors.option_type}
-            >
-              <option value="">-- Select Option Type --</option>
-              <option value="AB">AB</option>
-              <option value="BC">BC</option>
-              <option value="CD">CD</option>
-              <option value="DE">DE</option>
-            </Form.Select>
-
-            <Form.Control.Feedback type="invalid">
-              {errors.option_type?.message}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Row>
-        <Row>
-          <Form.Group as={Col} md="4">
-            <Form.Label>Skills</Form.Label>
-
-            <Form.Select
-              multiple
-              isInvalid={!!errors.skills}
-              {...register("skills")}
-              onChange={(e) => {
-                const values = Array.from(
-                  e.target.selectedOptions,
-                  (option) => option.value,
-                );
-                setValue("skills", values, { shouldValidate: true });
-              }}
-            >
-              <option value="cricket">Cricket</option>
-              <option value="badminton">Badminton</option>
-              <option value="a">a</option>
-              <option value="b">b</option>
-            </Form.Select>
-
-            <Form.Control.Feedback type="invalid">
-              {errors.skills?.message}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Row>
-        <Row>
-          <Form.Group as={Col} md="6">
-            <Form.Label>Tags</Form.Label>
-
-            {tagOptions.map((tag) => (
-              <Form.Check
-                key={tag}
-                type="checkbox"
-                label={tag}
-                value={tag}
-                {...register("tags")}
-                isInvalid={!!errors.tags}
+            <Form.Group className="mb-3">
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="Email"
+                {...register("email")}
+                isInvalid={!!errors.email}
               />
-            ))}
+              <Form.Control.Feedback type="invalid">
+                {errors.email?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
 
-            <Form.Control.Feedback type="invalid" className="d-block">
-              {errors.tags?.message}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Row>
-        <div className="mt-3 d-flex gap-2">
-          <Button type="submit" disabled={loading}>
-            {loading ? "Saving..." : "Save"}
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => navigate(-1)}
-          >
-            Cancel
-          </Button>
-        </div>
-      </Form>
+            <Form.Group className="mb-3">
+              <FloatingLabel label="Description">
+                <Form.Control
+                  as="textarea"
+                  style={{ height: "100px" }}
+                  {...register("description")}
+                  isInvalid={!!errors.description}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.description?.message}
+                </Form.Control.Feedback>
+              </FloatingLabel>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Author</Form.Label>
+              <Form.Control
+                type="text"
+                {...register("author")}
+                isInvalid={!!errors.author}
+              />
+              <Form.Control.Feedback type="invalid">
+                {errors.author?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Published</Form.Label>
+              <div>
+                <Form.Check
+                  inline
+                  type="radio"
+                  label="Yes"
+                  value="true"
+                  {...register("published", {
+                    setValueAs: (v) => v === "true",
+                  })}
+                />
+                <Form.Check
+                  inline
+                  type="radio"
+                  label="No"
+                  value="false"
+                  {...register("published", {
+                    setValueAs: (v) => v === "true",
+                  })}
+                />
+              </div>
+              {errors.published && (
+                <div className="text-danger small">
+                  {errors.published.message}
+                </div>
+              )}
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Option Type</Form.Label>
+              <Form.Select
+                {...register("option_type")}
+                isInvalid={!!errors.option_type}
+              >
+                <option value="">-- Select --</option>
+                <option value="AB">AB</option>
+                <option value="BC">BC</option>
+                <option value="CD">CD</option>
+                <option value="DE">DE</option>
+              </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                {errors.option_type?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-3">
+              <Form.Label>Skills</Form.Label>
+              <Form.Select
+                multiple
+                {...register("skills")}
+                isInvalid={!!errors.skills}
+                onChange={(e) =>
+                  setValue(
+                    "skills",
+                    Array.from(e.target.selectedOptions, (o) => o.value),
+                    { shouldValidate: true },
+                  )
+                }
+              >
+                <option value="cricket">Cricket</option>
+                <option value="badminton">Badminton</option>
+                <option value="a">a</option>
+                <option value="b">b</option>
+              </Form.Select>
+              <Form.Control.Feedback type="invalid">
+                {errors.skills?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+
+            <Form.Group className="mb-4">
+              <Form.Label>Tags</Form.Label>
+              {tagOptions.map((tag) => (
+                <Form.Check
+                  key={tag}
+                  type="checkbox"
+                  label={tag}
+                  value={tag}
+                  {...register("tags")}
+                />
+              ))}
+              {errors.tags && (
+                <div className="text-danger small">{errors.tags.message}</div>
+              )}
+            </Form.Group>
+
+            <div className="d-flex gap-2 justify-content-center mt-3">
+              <Button type="submit" disabled={loading}>
+                {loading ? "Saving..." : "Save"}
+              </Button>
+
+              <Button
+                variant="secondary"
+                onClick={() => navigate(`/post/list`)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </Form>
+        </Card.Body>
+      </Card>
     </Container>
   );
 }
