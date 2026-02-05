@@ -28,7 +28,7 @@ export class AuthService {
     if(!passwordMatched){
         throw new Error("INVALID_PASSWORD")
     }
-    let token = jwt.sign({"_id":result._id},process.env.SECRET_KEY||"")
+    let token = jwt.sign({"_id":result._id},process.env.JWT_SECRET||"")
 
     const userObj = result.toObject();
    // delete (userObj as any).password;

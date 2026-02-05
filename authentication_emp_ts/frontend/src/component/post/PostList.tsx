@@ -36,13 +36,17 @@ function PostList() {
     setLoading(true);
 
     try {
-      const { data } = await axios.get(`${BACKEND_URL}/api/posts`, {
+      const { data } = await axios.get(`${BACKEND_URL}/api/post`, {
         signal: controller.signal,
       });
       setPostData(data.data);
     } catch (error: any) {
       if (error.name !== "CanceledError") {
-        setMsg("Failed to load posts");
+        setMsg(
+          error?.response?.data?.message ||
+            error?.message ||
+            "Failed to load posts",
+        );
         setMsgType("danger");
       }
     } finally {
@@ -62,7 +66,7 @@ function PostList() {
     setPostData((prev) => prev.filter((p) => p._id !== id));
 
     try {
-      await axios.delete(`${BACKEND_URL}/api/posts/${id}`);
+      await axios.delete(`${BACKEND_URL}/api/post/${id}`);
       setMsg("Deleted successfully");
       setMsgType("success");
     } catch (error: any) {
@@ -117,7 +121,7 @@ function PostList() {
             <tbody>
               {postData.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center text-muted py-5">
+                  <td colSpan={10} className="text-center">
                     No posts found
                   </td>
                 </tr>

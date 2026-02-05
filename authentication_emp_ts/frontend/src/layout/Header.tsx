@@ -40,12 +40,21 @@ function Header() {
                   <Nav.Link as={NavLink} to="/registration">
                     Register
                   </Nav.Link>
+                  <Nav.Link as={NavLink} to="/aboutus">
+                    Aboutus
+                  </Nav.Link>
                 </>
               ) : (
                 <>
                   <NavDropdown title="Post">
                     <NavDropdown.Item as={NavLink} to="/post/list">
                       List
+                    </NavDropdown.Item>
+                    <NavDropdown.Item
+                      as={NavLink}
+                      to="/post/listWithPagination"
+                    >
+                      List With Pagination
                     </NavDropdown.Item>
                     <NavDropdown.Item as={NavLink} to="/post/add">
                       Add
@@ -60,7 +69,11 @@ function Header() {
                       Add
                     </NavDropdown.Item>
                   </NavDropdown>
-
+                  <NavDropdown title="Product">
+                    <NavDropdown.Item as={NavLink} to="/product/list">
+                      List
+                    </NavDropdown.Item>
+                  </NavDropdown>
                   <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
                 </>
               )}

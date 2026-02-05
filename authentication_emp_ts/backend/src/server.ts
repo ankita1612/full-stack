@@ -21,9 +21,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 connectDB();
-app.use("/api/posts", postRouter);
+app.use("/api/post", postRouter);
 app.use("/api/auth", authRouter);
-app.use("/api/employees", employeeRouter);
+app.use("/api/employee", employeeRouter);
 
 app.use('/uploads', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');

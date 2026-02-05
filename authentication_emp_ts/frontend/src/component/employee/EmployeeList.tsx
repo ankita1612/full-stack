@@ -1,106 +1,134 @@
-import React, { useEffect, useState } from "react";
-import { Button, Table } from "react-bootstrap";
-import "bootstrap/dist/css/bootstrap.min.css";
+import Container from "react-bootstrap/Container";
+import React, { useEffect, useState, useCallback } from "react";
+import { Button, Table, Spinner } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
-import axios from "axios";
 import type { IEmployee } from "../../interface/employee.interface";
 import EmployeeRow from "./EmployeeRow";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-const EmployeeList = () => {
-  const [employeeData, useEmployeeData] = useState<IEmployee[]>([]);
-  const [msg, setMsg] = useState("");
-  const [msgType, setMsgType] = useState("");
-  const location = useLocation();
-  useEffect(() => {
-    if (msg) {
-      const timer = setTimeout(() => {
-        setMsg("");
-      }, 3000);
+import Alert from "react-bootstrap/Alert";
+import apiClient from "../../utils/apiClient";
 
-      return () => clearTimeout(timer);
-    }
+function EmployeeList() {
+  const [employeeData, setemployeeData] = useState<IEmployee[]>([]);
+  const [msg, setMsg] = useState("");
+  const [msgType, setMsgType] = useState<"success" | "danger" | "">("");
+  const [loading, setLoading] = useState(false);
+  const location = useLocation();
+
+  // Auto hide message
+  useEffect(() => {
+    if (!msg) return;
+    const timer = setTimeout(() => setMsg(""), 3000);
+    return () => clearTimeout(timer);
   }, [msg]);
+
+  // Message from navigation
   useEffect(() => {
     if (location.state?.msg) {
       setMsg(location.state.msg);
       setMsgType(location.state.type);
     }
   }, [location.state]);
-  const fetch = async () => {
+
+  // Fetch employee
+  const fetchData = useCallback(async () => {
+    const controller = new AbortController();
+    setLoading(true);
+
     try {
-      const response = await axios.get(BACKEND_URL + "/api/employees");
-      if (response.status === 201) {
-        useEmployeeData(response.data.data);
-        console.log(response.data.data);
-      }
+      const { data } = await apiClient.get(`/api/employee`, {
+        signal: controller.signal,
+      });
+      setemployeeData(data.data);
     } catch (error: any) {
-      if (error.status == 422) {
-        setMsg(error?.response?.data?.message);
-        setMsgType("error");
+      if (error.name !== "CanceledError") {
+        setMsg("Failed to load employees");
+        setMsgType("danger");
       }
+    } finally {
+      setLoading(false);
     }
-  };
-  useEffect(() => {
-    fetch();
+
+    return () => controller.abort();
   }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Delete employee with optimistic delete
   const handleDelete = async (id: string) => {
+    const previousData = employeeData;
+    setemployeeData((prev) => prev.filter((p) => p._id !== id));
+
     try {
-      const response = await axios.delete(BACKEND_URL + "/api/employees/" + id);
-      fetch();
-      setMsg(response?.data?.message);
+      await apiClient.delete(`/api/employee/${id}`);
+      setMsg("Deleted successfully");
       setMsgType("success");
-      console.log(response?.data?.message);
     } catch (error: any) {
-      if (error.status == 422) {
-        setMsg(error?.response?.data?.message);
-        setMsgType("error");
-      }
+      setemployeeData(previousData);
+      setMsg(error.response?.data?.message || "Delete failed");
+      setMsgType("danger");
     }
   };
+
   return (
-    <div style={{ margin: "2rem" }}>
-      <h1 className="text-center mb-4">Employee</h1>
-      <div className="d-grid gap-2 mt-4">
+    <Container>
+      {/* Header Row */}
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="mb-0">employees</h2>
         <Link to="/employee/add">
-          <Button variant="success" size="lg">
-            Create Employee
-          </Button>
+          <Button variant="success">Create Employee</Button>
         </Link>
       </div>
+
+      {/* Alert */}
       {msg && (
-        <div className="d-flex justify-content-center mt-3">
-          <div
-            className={`alert ${
-              msgType === "success" ? "alert-success" : "alert-danger"
-            } text-center`}
-            role="alert"
-            style={{ minWidth: "300px" }}
-          >
-            {msg}
-          </div>
+        <Alert
+          variant={msgType === "success" ? "success" : "danger"}
+          className="text-center"
+        >
+          {msg}
+        </Alert>
+      )}
+
+      {/* Loader */}
+      {loading ? (
+        <div className="text-center py-5">
+          <Spinner animation="border" />
+        </div>
+      ) : (
+        <div className="table-responsive">
+          <Table striped hover className="align-middle">
+            <thead className="table-light">
+              <tr>
+                <th>Title</th>
+                <th>single image</th>
+                <th>DOB</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {employeeData.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="text-center text-muted py-5">
+                    No employees found
+                  </td>
+                </tr>
+              ) : (
+                employeeData.map((item) => (
+                  <EmployeeRow
+                    key={item._id}
+                    employeeData={item}
+                    handleDelete={handleDelete}
+                  />
+                ))
+              )}
+            </tbody>
+          </Table>
         </div>
       )}
-      <Table striped bordered hover>
-        <thead className="thead-dark">
-          <tr>
-            <th>Title</th>
-            <th>single image</th>
-            <th>DOB</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {employeeData.map((item) => (
-            <EmployeeRow
-              key={item._id}
-              employeeData={item}
-              handleDelete={handleDelete}
-            />
-          ))}
-        </tbody>
-      </Table>
-    </div>
+    </Container>
   );
-};
+}
 
 export default EmployeeList;

@@ -2,9 +2,9 @@ import express from "express";
 import { postController } from '../controllers/post.controller'
 import { validateAdd, isRequestValidated,validateEdit } from '../validations/post.validations'
 const postRouter = express.Router()
-
-postRouter.post('/',validateAdd,isRequestValidated, postController.addPost)
-postRouter.get('/',postController.getPosts)
+import authentication from "../middleware/auth.middleware"
+postRouter.post('/',authentication,validateAdd,isRequestValidated, postController.addPost)
+postRouter.get('/',authentication,postController.getPosts)
 postRouter.get('/:id', postController.getPost)
 postRouter.put('/:id', validateEdit, isRequestValidated, postController.updatePost)
 postRouter.delete('/:id', postController.deletePost)

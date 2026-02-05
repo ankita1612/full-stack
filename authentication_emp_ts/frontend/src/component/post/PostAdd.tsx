@@ -63,7 +63,7 @@ function PostAdd() {
     const fetchPost = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(`${BACKEND_URL}/api/posts/${id}`);
+        const { data } = await axios.get(`${BACKEND_URL}/api/post/${id}`);
         Object.entries(data.data).forEach(([k, v]) =>
           setValue(k as keyof IPost, v),
         );
@@ -123,9 +123,9 @@ function PostAdd() {
       };
       let res: any;
       if (mode == "add") {
-        res = await axios.post(BACKEND_URL + "/api/posts", send_data);
+        res = await axios.post(BACKEND_URL + "/api/post", send_data);
       } else {
-        res = await axios.put(BACKEND_URL + "/api/posts/" + id, send_data);
+        res = await axios.put(BACKEND_URL + "/api/post/" + id, send_data);
       }
 
       navigate("/post/list", {
