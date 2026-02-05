@@ -1,33 +1,30 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import User from "../models/user.model";
 import { Request, Response, NextFunction } from "express";
+import ApiError from "../utils/api.error";
 
 interface AuthRequest extends Request {
   user?: any;
 }
 
-const authentication = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-) => {
+const authentication = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
 
     if (!authHeader?.startsWith("Bearer ")) {
-      return res.status(401).json({ success: false, message: "Authorization header missing" });
+      throw new ApiError("Authorization header missing", 401);
     }
 
     const token = authHeader.split(" ")[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
 
-    if (!process.env.JWT_SECRET) {
-      throw new Error("JWT_SECRET not configured");
+    if (!decoded || !decoded._id) {
+      throw new ApiError("Invalid token payload", 401);
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
-    const user = await User.findById(decoded._id);
+    const user = await User.findById(decoded._id).select("_id email role");
     if (!user) {
-      return res.status(401).json({ success: false, message: "User not found" });
+      throw new ApiError("User not found", 401);
     }
 
     req.user = user;
@@ -35,10 +32,12 @@ const authentication = async (
 
   } catch (error: any) {
     if (error.name === "TokenExpiredError") {
-      return res.status(401).json({ success: false, message: "Token expired" });
+      return next(new ApiError("Token expired", 401));
     }
-
-    return res.status(401).json({ success: false, message: "Authentication failed" });
+    if (error.name === "JsonWebTokenError") {
+      return next(new ApiError("Invalid token", 401));
+    }
+    next(error);
   }
 };
 

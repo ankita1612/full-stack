@@ -53,7 +53,7 @@ class PostController {
   testPost= async (req: Request<{ id: string }>, res: Response, next: NextFunction): Promise<void> => {
     try {
       const data = await postService.testPost(req.body.id);
-      res.status(201).json({"success":true,"message":"Post deleted successfully","data":data});
+      res.status(200).json({"success":true,"message":"Post deleted successfully","data":data});
     } catch (error) {
       next(error);
     }

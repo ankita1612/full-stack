@@ -29,7 +29,7 @@ class EmployeeController {
   getEmployees = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {     
       const employees = await employeeService.getEmployees();
-      res.status(201).json({"success":true,"message":"","data":employees});
+      res.status(200).json({"success":true,"message":"","data":employees});
     } catch (error) {
       next(error);
     }
@@ -73,7 +73,7 @@ class EmployeeController {
         return next(error);
       }
 
-      res.status(201).json({"success":true,"message":"Employee update successfully","data":employee});
+      res.status(200).json({"success":true,"message":"Employee update successfully","data":employee});
     } catch (error) {
       next(error);
     }
@@ -92,7 +92,7 @@ class EmployeeController {
         error.statusCode = 400;
         return next(error);
       }
-      res.status(201).json({"success":true,"message":"Employee deleted successfully","data":[]});
+      res.status(200).json({"success":true,"message":"Employee deleted successfully","data":[]});
     } catch (error) {
       next(error);
     }

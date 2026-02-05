@@ -1,11 +1,11 @@
 import express from "express";
 import {authController}  from '../controllers/auth.controller'
-import { login, registration ,isRequestValidated } from '../validations/auth.validations'
-import { upload } from "../middleware/upload.middleware";
+import { validateLogin, validateRegister ,isRequestValidated } from '../validations/auth.validations'
+import { singleUpload } from "../middleware/singleupload.middleware";
 
 const authRouter = express.Router()
 
-authRouter.post('/register',upload.single('profile_image'),registration, isRequestValidated, authController.registration)
-authRouter.post('/login' ,login, authController.login)
+authRouter.post('/register', singleUpload.single('profile_image'), validateRegister, isRequestValidated, authController.register)
+authRouter.post('/login', validateLogin, isRequestValidated, authController.login)
 
 export default authRouter;

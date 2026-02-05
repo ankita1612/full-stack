@@ -4,7 +4,9 @@ packages to install
 +++++++++++++++++++
 npm install cors dotenv express express-validator helmet mongoose @types/cors @types/dotenv @types/helmet @types/mongoose
 
-npm install bcrypt @types/bcrypt
+npm i express-rate-limit
+
+///npm install bcrypt @types/bcrypt
 
 npm install jsonwebtoken @types/jsonwebtoken
 
