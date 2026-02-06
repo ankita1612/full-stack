@@ -104,7 +104,7 @@ function PostAdd() {
     if (msg) {
       const timer = setTimeout(() => {
         setMsg("");
-      }, 3000);
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [msg]);

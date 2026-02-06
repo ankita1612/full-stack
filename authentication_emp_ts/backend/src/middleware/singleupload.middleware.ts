@@ -3,7 +3,8 @@ import path from "path";
 import fs from "fs";
 import { Request } from "express";
 
-const uploadPath = path.join(__dirname, "../uploads");
+//const uploadPath = path.join(__dirname, "../uploads");
+const uploadPath ="uploads"
 
 // Ensure folder exists
 if (!fs.existsSync(uploadPath)) {

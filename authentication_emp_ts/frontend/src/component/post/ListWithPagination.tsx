@@ -6,7 +6,8 @@ import axios from "axios";
 import type { IPost } from "../../interface/post.interface";
 import PostRow from "./PostRow";
 import Alert from "react-bootstrap/Alert";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import "bootstrap-icons/font/bootstrap-icons.css";
+
 import apiClient from "../../utils/apiClient";
 
 function ListWithPagination() {
@@ -17,10 +18,10 @@ function ListWithPagination() {
   const location = useLocation();
 
   const [search, setSearch] = useState("");
-  const [sortField, setSortField] = useState("date");
+  const [sortField, setSortField] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 5;
+  const [postsPerPage, setPostsPerPage] = useState(5);
 
   const filteredPosts = postData.filter((post) =>
     Object.values(post).join(" ").toLowerCase().includes(search.toLowerCase()),
@@ -69,7 +70,7 @@ function ListWithPagination() {
 
   useEffect(() => {
     if (!msg) return;
-    const timer = setTimeout(() => setMsg(""), 3000);
+    const timer = setTimeout(() => setMsg(""), 5000);
     return () => clearTimeout(timer);
   }, [msg]);
 
@@ -128,15 +129,31 @@ function ListWithPagination() {
 
   return (
     <Container>
-      {/* Header Row */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-0">Posts</h2>
+        <div className="d-flex align-items-center">
+          <span className="me-2">Show</span>
+          <Form.Select
+            size="sm"
+            style={{ width: "80px" }}
+            value={postsPerPage}
+            onChange={(e) => {
+              setPostsPerPage(Number(e.target.value));
+              setCurrentPage(1);
+            }}
+          >
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={50}>50</option>
+          </Form.Select>
+          <span className="ms-2">entries</span>
+        </div>
         <Link to="/post/add">
           <Button variant="success">+ Create Post</Button>
         </Link>
       </div>
 
-      {/* Alert */}
       {msg && (
         <Alert
           variant={msgType === "success" ? "success" : "danger"}
@@ -146,7 +163,6 @@ function ListWithPagination() {
         </Alert>
       )}
 
-      {/* Loader */}
       {loading ? (
         <div className="text-center py-5">
           <Spinner animation="border" />
@@ -168,14 +184,24 @@ function ListWithPagination() {
                   style={{ cursor: "pointer" }}
                 >
                   Title{" "}
-                  {sortField === "title" && (sortOrder === "asc" ? "▲" : "▼")}
+                  {sortField === "title" &&
+                    (sortOrder === "asc" ? (
+                      <i className="bi bi-arrow-up"></i>
+                    ) : (
+                      <i className="bi bi-arrow-down"></i>
+                    ))}
                 </th>
                 <th
                   onClick={() => handleSort("email")}
                   style={{ cursor: "pointer" }}
                 >
                   Email{" "}
-                  {sortField === "email" && (sortOrder === "asc" ? "▲" : "▼")}
+                  {sortField === "email" &&
+                    (sortOrder === "asc" ? (
+                      <i className="bi bi-arrow-up"></i>
+                    ) : (
+                      <i className="bi bi-arrow-down"></i>
+                    ))}
                 </th>
 
                 <th
@@ -184,14 +210,23 @@ function ListWithPagination() {
                 >
                   Desc{" "}
                   {sortField === "description" &&
-                    (sortOrder === "asc" ? "▲" : "▼")}
+                    (sortOrder === "asc" ? (
+                      <i className="bi bi-arrow-up"></i>
+                    ) : (
+                      <i className="bi bi-arrow-down"></i>
+                    ))}
                 </th>
                 <th
                   onClick={() => handleSort("author")}
                   style={{ cursor: "pointer" }}
                 >
                   Author{" "}
-                  {sortField === "author" && (sortOrder === "asc" ? "▲" : "▼")}
+                  {sortField === "author" &&
+                    (sortOrder === "asc" ? (
+                      <i className="bi bi-arrow-up"></i>
+                    ) : (
+                      <i className="bi bi-arrow-down"></i>
+                    ))}
                 </th>
                 <th
                   onClick={() => handleSort("published")}
@@ -199,7 +234,11 @@ function ListWithPagination() {
                 >
                   Published{" "}
                   {sortField === "published" &&
-                    (sortOrder === "asc" ? "▲" : "▼")}
+                    (sortOrder === "asc" ? (
+                      <i className="bi bi-arrow-up"></i>
+                    ) : (
+                      <i className="bi bi-arrow-down"></i>
+                    ))}
                 </th>
                 <th
                   onClick={() => handleSort("option_type")}
@@ -207,7 +246,11 @@ function ListWithPagination() {
                 >
                   Type{" "}
                   {sortField === "option_type" &&
-                    (sortOrder === "asc" ? "▲" : "▼")}
+                    (sortOrder === "asc" ? (
+                      <i className="bi bi-arrow-up"></i>
+                    ) : (
+                      <i className="bi bi-arrow-down"></i>
+                    ))}
                 </th>
                 <th>Skills</th>
                 <th>Tags</th>
@@ -217,7 +260,11 @@ function ListWithPagination() {
                 >
                   Date{" "}
                   {sortField === "createdAt" &&
-                    (sortOrder === "asc" ? "▲" : "▼")}
+                    (sortOrder === "asc" ? (
+                      <i className="bi bi-arrow-up"></i>
+                    ) : (
+                      <i className="bi bi-arrow-down"></i>
+                    ))}
                 </th>
                 <th className="text-center">Actions</th>
               </tr>
@@ -240,21 +287,22 @@ function ListWithPagination() {
               )}
             </tbody>
           </Table>
-          <Pagination className="justify-content-center mt-4">
-            {[...Array(totalPages)].map((_, i) => (
-              <Pagination.Item
-                key={i + 1}
-                active={i + 1 === currentPage}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </Pagination.Item>
-            ))}
-          </Pagination>
+          {totalPages > 1 && (
+            <Pagination className="justify-content-center mt-4">
+              {[...Array(totalPages)].map((_, i) => (
+                <Pagination.Item
+                  key={i + 1}
+                  active={i + 1 === currentPage}
+                  onClick={() => setCurrentPage(i + 1)}
+                >
+                  {i + 1}
+                </Pagination.Item>
+              ))}
+            </Pagination>
+          )}
         </div>
       )}
     </Container>
   );
 }
-
 export default ListWithPagination;

@@ -4,7 +4,8 @@ import fs from "fs";
 import crypto from "crypto";
 import ApiError from "../utils/api.error";
 
-const uploadPath = path.join(__dirname, "..", "..", "uploads");
+//const uploadPath = path.join(__dirname, "..", "..", "uploads");
+const uploadPath ="uploads"
 
 // Ensure folder exists
 if (!fs.existsSync(uploadPath)) {

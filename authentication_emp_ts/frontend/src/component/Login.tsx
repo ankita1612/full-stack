@@ -5,8 +5,6 @@ import type { loginInterface } from "../interface/login.interface";
 import loginValidate from "../validation/login.validation";
 import { Form, Button, Card, Container, Alert } from "react-bootstrap";
 import { useNavigate, useLocation } from "react-router";
-import axios from "axios";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import { useAuth } from "../context/AuthContext";
 import apiClient from "../utils/apiClient";
 
@@ -35,7 +33,7 @@ const Login = () => {
     if (msg) {
       const timer = setTimeout(() => {
         setMsg("");
-      }, 3000);
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [msg]);

@@ -9,10 +9,11 @@ class EmployeeController {
         const files = req.files as {
         [fieldname: string]: Express.Multer.File[];
       };
+      
       let singleImagePath = files?.single_image ? files.single_image[0].path : "";    
       const multiImagePaths = files?.multi_image ? files.multi_image.map(file => file.path): [];
       singleImagePath= singleImagePath.replace(/\\/g, "/")
-     
+           
       const employee = await employeeService.createEmployee({
           ...req.body,                  
           single_image: singleImagePath,

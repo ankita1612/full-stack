@@ -63,5 +63,4 @@ function PostRow({ postData, handleDelete }: PostRowProps) {
     </tr>
   );
 }
-
 export default PostRow;

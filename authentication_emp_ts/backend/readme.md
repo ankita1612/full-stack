@@ -10,6 +10,8 @@ npm i express-rate-limit
 
 ///npm install bcrypt @types/bcrypt
 
+npm install cookie-parser @types/cookie-parser // if refresh token then only
+
 npm install jsonwebtoken @types/jsonwebtoken
 
 npm install multer @types/multer

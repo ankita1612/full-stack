@@ -14,6 +14,9 @@ import type { IEmployee } from "../../interface/employee.interface";
 
 import axios from "axios";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+type FormDataType = {
+  multi_image: FileList | File[];
+};
 const schema = yup.object().shape({
   title: yup.string().required("Title is required"),
   single_image: yup
@@ -26,6 +29,11 @@ const schema = yup.object().shape({
     .test("fileSize", "File too large (max 2MB)", (value) => {
       if (!value || !(value instanceof File)) return false;
       return value.size <= 2 * 1024 * 1024;
+    }),
+  multi_image: yup
+    .mixed()
+    .test("required", "At least one file required", (value: any) => {
+      return value && value.length > 0;
     }),
   DOB: yup
     .date()
@@ -79,8 +87,15 @@ function EmployeeAdd() {
     if (!id) return;
     const fetchEmployee = async () => {
       setLoading(true);
+      const stored = JSON.parse(localStorage.getItem("auth_data") || "{}");
+      const token = stored?.accessToken;
       try {
-        const { data } = await axios.get(`${BACKEND_URL}/api/employee/${id}`);
+        const { data } = await axios.get(`${BACKEND_URL}/api/employee/${id}`, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
         // Object.entries(data.data).forEach(([k, v]) =>
         //   setValue(k as keyof IEmployee, v),
         // );
@@ -127,26 +142,42 @@ function EmployeeAdd() {
   const onSubmit = async (data: IEmployee) => {
     setLoading(true);
     try {
-      const send_data = {
-        title: data.title,
-        single_image: data.single_image,
-        DOB: data.DOB,
+      const stored = JSON.parse(localStorage.getItem("auth_data") || "{}");
+      const token = stored?.accessToken;
+      const header = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
       };
+
+      const formData = new FormData();
+      formData.append("title", data.title);
+      formData.append(
+        "DOB",
+        typeof data.DOB === "string"
+          ? data.DOB
+          : new Date(data.DOB).toISOString().split("T")[0],
+      );
+
+      if (data.single_image) {
+        formData.append("single_image", data.single_image);
+      }
+      console.log(data.multi_image);
+      if (data.multi_image) {
+        data.multi_image.forEach((file) => {
+          formData.append("multi_image", file);
+        });
+      }
       let res: any;
-      if (mode == "add") {
-        res = await axios.post(BACKEND_URL + "/api/employee", send_data, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("auth_data")}`, // if auth
-          },
-        });
+      if (mode === "add") {
+        res = await axios.post(`${BACKEND_URL}/api/employee`, formData, header);
       } else {
-        res = await axios.put(BACKEND_URL + "/api/employee/" + id, send_data, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${localStorage.getItem("auth_data")}`, // if auth
-          },
-        });
+        res = await axios.put(
+          `${BACKEND_URL}/api/employee/${id}`,
+          formData,
+          header,
+        );
       }
 
       navigate("/employee/list", {
@@ -216,6 +247,26 @@ function EmployeeAdd() {
               />
               <Form.Control.Feedback type="invalid">
                 {errors.single_image?.message}
+              </Form.Control.Feedback>
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Upload Multiple Files</Form.Label>
+
+              <Form.Control
+                type="file"
+                multiple
+                accept=".jpg,.jpeg,.png,.pdf"
+                isInvalid={!!errors.multi_image}
+                onChange={(e) => {
+                  const files = (e.target as HTMLInputElement).files;
+                  if (files) {
+                    setValue("multi_image", Array.from(files)); // File[]
+                  }
+                }}
+              />
+
+              <Form.Control.Feedback type="invalid">
+                {errors.multi_image?.message}
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group>

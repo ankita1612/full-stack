@@ -18,7 +18,7 @@ function PostList() {
   // Auto hide message
   useEffect(() => {
     if (!msg) return;
-    const timer = setTimeout(() => setMsg(""), 3000);
+    const timer = setTimeout(() => setMsg(""), 5000);
     return () => clearTimeout(timer);
   }, [msg]);
 

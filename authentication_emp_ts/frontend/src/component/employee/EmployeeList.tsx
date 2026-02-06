@@ -17,7 +17,7 @@ function EmployeeList() {
   // Auto hide message
   useEffect(() => {
     if (!msg) return;
-    const timer = setTimeout(() => setMsg(""), 3000);
+    const timer = setTimeout(() => setMsg(""), 5000);
     return () => clearTimeout(timer);
   }, [msg]);
 
@@ -73,7 +73,6 @@ function EmployeeList() {
 
   return (
     <Container>
-      {/* Header Row */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-0">employees</h2>
         <Link to="/employee/add">
@@ -81,7 +80,6 @@ function EmployeeList() {
         </Link>
       </div>
 
-      {/* Alert */}
       {msg && (
         <Alert
           variant={msgType === "success" ? "success" : "danger"}
@@ -91,7 +89,6 @@ function EmployeeList() {
         </Alert>
       )}
 
-      {/* Loader */}
       {loading ? (
         <div className="text-center py-5">
           <Spinner animation="border" />
@@ -130,5 +127,4 @@ function EmployeeList() {
     </Container>
   );
 }
-
 export default EmployeeList;

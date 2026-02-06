@@ -6,7 +6,6 @@ import registrationValidate from "../validation/registration.validations";
 import type { registrationInterface } from "../interface/registrations.interface";
 
 import { useNavigate } from "react-router-dom";
-//const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import apiClient from "../utils/apiClient";
 
 const Registration = () => {
@@ -138,5 +137,4 @@ const Registration = () => {
     </Container>
   );
 };
-
 export default Registration;
