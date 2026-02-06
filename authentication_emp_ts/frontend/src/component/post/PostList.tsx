@@ -64,10 +64,9 @@ function PostList() {
   const handleDelete = async (id: string) => {
     const previousData = postData;
     setPostData((prev) => prev.filter((p) => p._id !== id));
-
     try {
-      await apiClient.delete(`/api/post/${id}`);
-      setMsg("Deleted successfully");
+      const res = await apiClient.delete(`/api/post/${id}`);
+      setMsg(res.data.message);
       setMsgType("success");
     } catch (error: any) {
       setPostData(previousData);
@@ -78,7 +77,6 @@ function PostList() {
 
   return (
     <Container>
-      {/* Header Row */}
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-0">Posts</h2>
         <Link to="/post/add">
@@ -86,7 +84,6 @@ function PostList() {
         </Link>
       </div>
 
-      {/* Alert */}
       {msg && (
         <Alert
           variant={msgType === "success" ? "success" : "danger"}
@@ -96,7 +93,6 @@ function PostList() {
         </Alert>
       )}
 
-      {/* Loader */}
       {loading ? (
         <div className="text-center py-5">
           <Spinner animation="border" />
@@ -122,7 +118,7 @@ function PostList() {
               {postData.length === 0 ? (
                 <tr>
                   <td colSpan={10} className="text-center">
-                    No posts found
+                    No post found
                   </td>
                 </tr>
               ) : (
@@ -141,5 +137,4 @@ function PostList() {
     </Container>
   );
 }
-
 export default PostList;

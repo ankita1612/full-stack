@@ -6,19 +6,24 @@ import Card from "react-bootstrap/Card";
 import logo from "../assets/images/1.png";
 import { useNavigate, NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import apiClient from "../utils/apiClient";
 
 function Header() {
   const navigate = useNavigate();
-  const { logout, user, loading, accessToken } = useAuth();
+  const { logout, user } = useAuth();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await apiClient.post("/api/auth/logout");
+    } catch (err) {
+      console.error("Server logout failed", err);
+    }
     logout();
     navigate("/login", {
+      replace: true,
       state: { msg: "Logout successfully", type: "success" },
     });
   };
-
-  if (loading) return null; // wait until auth loads
 
   return (
     <Card.Header className="p-0">

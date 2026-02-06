@@ -14,7 +14,7 @@ import PublicRoute from "./layout/PublicRoute";
 import Dashboard from "./component/Dashboard";
 import Aboutus from "./component/Aboutus";
 import ProductList from "./component/product/ProductList";
-
+import PageNotFound from "./component/PageNotFound";
 const App = () => {
   return (
     <Card>
@@ -54,6 +54,7 @@ const App = () => {
               </PrivateRoute>
             }
           />
+          <Route path="*" element={<PageNotFound />} />
         </Routes>
       </Card.Body>
     </Card>

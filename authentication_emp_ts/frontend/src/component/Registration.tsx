@@ -4,9 +4,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Form, Button, Card, Container, Alert } from "react-bootstrap";
 import registrationValidate from "../validation/registration.validations";
 import type { registrationInterface } from "../interface/registrations.interface";
-import axios from "axios";
+
 import { useNavigate } from "react-router-dom";
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+//const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import apiClient from "../utils/apiClient";
 
 const Registration = () => {
@@ -37,7 +37,9 @@ const Registration = () => {
       const result = await apiClient.post("/api/auth/register", data);
       setMsg(result.data.message);
       setMsgType("success");
-      return navigate("/login");
+      return navigate("/login", {
+        state: { msg: result.data.message, type: "success" },
+      });
     } catch (error: any) {
       setMsg(error.response?.data?.message || "Server Error");
       setMsgType("danger");

@@ -5,3 +5,4 @@ export default interface IRefreshToken {
   token: string;
   expiresAt: Date;
 }
+

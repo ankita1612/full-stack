@@ -1,8 +1,9 @@
 import axios from "axios";
+const BACKEND_URL="http://localhost:5000"
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:5000",
-  withCredentials: true,   // ⭐ REQUIRED
+  baseURL: BACKEND_URL,
+  withCredentials: true,  
 });
 
 apiClient.interceptors.request.use((request) => {
@@ -27,28 +28,23 @@ apiClient.interceptors.request.use((request) => {
 apiClient.interceptors.response.use(
   (res) => res,
   async (error) => {
-    const originalRequest = error.config;
-    console.log("=======>"+error.response?.status)
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const originalRequest = error.config;    
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes("/auth/login") && !originalRequest.url?.includes("/auth/refresh")) {
       originalRequest._retry = true;
 
-      try {
-        console.log(1)
+      try {        
         const { data } = await axios.post(
-          "http://localhost:5000/api/auth/refresh",
+          BACKEND_URL+"/api/auth/refresh",
           {},
           { withCredentials: true }
         );
-console.log(2)
-        const stored = JSON.parse(localStorage.getItem("auth_data") || "{}");
-        console.log("old==>"+stored.accessToken)
-        stored.accessToken = data.accessToken;
-        console.log("new==>"+data.accessToken)
+        const stored = JSON.parse(localStorage.getItem("auth_data") || "{}");        
+        stored.accessToken = data.accessToken;        
 
         const user_data = {
         accessToken: data.accessToken,
         user: {
-          username: stored.user.username,
+          username: stored.user.username ||  null,
           id: stored.user._id,
         },
       };
@@ -56,8 +52,7 @@ console.log(2)
 
         originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
         return apiClient(originalRequest);
-      } catch (error: any){
-        console.log(error)
+      } catch (error: any){        
          localStorage.removeItem("auth_data");       
         window.location.href = "/login";
       }

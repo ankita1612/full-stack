@@ -55,7 +55,7 @@ const Login = () => {
           id: result.data.data.user._id,
         },
       };
-      console.log(user_data);
+      //console.log(user_data);
       //localStorage.setItem("user_data", JSON.stringify(user_data));
 
       //context API

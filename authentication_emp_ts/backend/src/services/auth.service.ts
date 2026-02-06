@@ -15,7 +15,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
     let user = await User.create({
-      name: data.name,
+      name: data.name.trim(),
       email: data.email.toLowerCase().trim(),
       password: hashedPassword,
       DOB: data.DOB,
@@ -62,33 +62,30 @@ export class AuthService {
   }
 
 
-
   async refreshAccessToken(incomingToken: string)  {
     if (!incomingToken) throw new ApiError("No refresh token", 401);
 
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(incomingToken)
-      .digest("hex");
+    const hashedToken = crypto.createHash("sha256").update(incomingToken).digest("hex");
 
     const stored = await RefreshToken.findOne({ token: hashedToken });
     if (!stored) throw new ApiError("Invalid session", 403);
 
     // Verify JWT integrity
     const decoded: any = jwt.verify(incomingToken, process.env.REFRESH_SECRET!);
-
-    // Check expiry in DB
+    
     if (stored.expiresAt < new Date()) {
       throw new ApiError("Refresh token expired", 403);
     }
 
-    const newAccessToken = jwt.sign(
-      { id: decoded.id },
-      process.env.ACCESS_SECRET!,
-      { expiresIn: "15m" }
-    );
+    const newAccessToken = jwt.sign({ id: decoded.id },process.env.ACCESS_SECRET!,{ expiresIn: "15m" });
 
     return newAccessToken;
+  };
+
+  async logout (refreshToken?: string): Promise<void> {
+    if (!refreshToken) return;
+    const hashed = crypto.createHash("sha256").update(refreshToken).digest("hex");
+    await RefreshToken.deleteOne({ token: hashed });
   };
 }
 export const authService = new AuthService();
