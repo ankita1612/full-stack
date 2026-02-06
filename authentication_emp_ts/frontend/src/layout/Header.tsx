@@ -22,7 +22,6 @@ function Header() {
 
   return (
     <Card.Header className="p-0">
-      [{accessToken}]
       <Navbar expand="lg" bg="light">
         <Container>
           <Navbar.Brand as={NavLink} to="/">
