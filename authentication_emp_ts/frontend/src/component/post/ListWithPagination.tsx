@@ -7,6 +7,7 @@ import type { IPost } from "../../interface/post.interface";
 import PostRow from "./PostRow";
 import Alert from "react-bootstrap/Alert";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+import apiClient from "../../utils/apiClient";
 
 function ListWithPagination() {
   const [postData, setPostData] = useState<IPost[]>([]);
@@ -85,7 +86,7 @@ function ListWithPagination() {
     setLoading(true);
 
     try {
-      const { data } = await axios.get(`/api/post`, {
+      const { data } = await apiClient.get(`/api/post`, {
         signal: controller.signal,
       });
       setPostData(data.data);
@@ -115,7 +116,7 @@ function ListWithPagination() {
     setPostData((prev) => prev.filter((p) => p._id !== id));
 
     try {
-      await axios.delete(`${BACKEND_URL}/api/post/${id}`);
+      await apiClient.delete(`/api/post/${id}`);
       setMsg("Deleted successfully");
       setMsgType("success");
     } catch (error: any) {

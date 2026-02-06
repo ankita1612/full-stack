@@ -1,8 +1,11 @@
 import User from "../models/user.model";
+import RefreshToken from "../models/refresh.model";
 import  IUser ,{ILoginResponse, ILogin}  from "../interface/user.interface";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
 import  ApiError  from "../utils/api.error";
+import crypto from "crypto";
+
 export class AuthService {
   async register(data: IUser ): Promise<IUser> {
     const result  = await User.findOne({"email":data.email})
@@ -21,27 +24,71 @@ export class AuthService {
     return user;
   }
   async login(data: ILogin ): Promise<ILoginResponse | null | String> {
-    const result  = await User.findOne({"email":data.email})
-    if(!result){        
+    const user  = await User.findOne({"email":data.email})
+    if(!user){        
         throw new ApiError("User not exist", 404);        
     }
-    const passwordMatched = await bcrypt.compare(data.password, result.password );
+    const passwordMatched = await bcrypt.compare(data.password, user.password );
     if(!passwordMatched){        
         throw new ApiError("Invalid password", 401);
     }
 
-    if (!process.env.JWT_SECRET) {
-      throw new ApiError("JWT_SECRET not configured",500);
+    if (!process.env.ACCESS_SECRET || !process.env.REFRESH_SECRET  ) {
+      throw new ApiError("ACCESS_SECRET or REFRESH_SECRET not configured",500);
     }
-    let token = jwt.sign({ _id: result._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
-    const userObj = result.toObject();
+    const accessToken = jwt.sign({ id: user._id }, process.env.ACCESS_SECRET!, {
+    expiresIn: "15m",
+  });
+
+  const refreshToken = jwt.sign({ id: user._id }, process.env.REFRESH_SECRET!, {
+    expiresIn: "7d",
+  });
+
+  const hashedToken = crypto.createHash("sha256").update(refreshToken).digest("hex");
+
+  await RefreshToken.create({
+    userId: user._id,
+    token: hashedToken,
+    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+  });
+
+    const userObj = user.toObject();
    // delete (userObj as any).password;
 
     return {
-      user: userObj,
-      token,
+      user: userObj, accessToken, refreshToken,
     };
   }
+
+
+
+  async refreshAccessToken(incomingToken: string)  {
+    if (!incomingToken) throw new ApiError("No refresh token", 401);
+
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(incomingToken)
+      .digest("hex");
+
+    const stored = await RefreshToken.findOne({ token: hashedToken });
+    if (!stored) throw new ApiError("Invalid session", 403);
+
+    // Verify JWT integrity
+    const decoded: any = jwt.verify(incomingToken, process.env.REFRESH_SECRET!);
+
+    // Check expiry in DB
+    if (stored.expiresAt < new Date()) {
+      throw new ApiError("Refresh token expired", 403);
+    }
+
+    const newAccessToken = jwt.sign(
+      { id: decoded.id },
+      process.env.ACCESS_SECRET!,
+      { expiresIn: "15m" }
+    );
+
+    return newAccessToken;
+  };
 }
 export const authService = new AuthService();

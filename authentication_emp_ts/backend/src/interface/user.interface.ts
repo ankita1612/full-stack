@@ -13,7 +13,8 @@ export enum Status {
 export interface ILoginResponse {
   //user: Omit<IUser, "password">;
   user: IUser;
-  token: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export interface ILogin {

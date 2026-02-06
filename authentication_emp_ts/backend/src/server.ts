@@ -7,6 +7,7 @@ import cors from "cors";
 import { Request, Response, NextFunction } from 'express'
 import path from "path"
 import http from "http";
+import cookieParser from "cookie-parser";
 
 import connectDB from "./config/db.config";
 import postRouter from "./routes/post.route";
@@ -18,6 +19,8 @@ import  ApiError  from "./utils/api.error";
 const app = express();
 
 // middlewares
+app.use(cookieParser());   
+
 app.use(cors({origin: process.env.FRONTEND_URL,credentials: true,})); //Allows browser to send secure credentials with request
 app.use(helmet({crossOriginResourcePolicy: false,}));
 app.use(rateLimit({windowMs: 15 * 60 * 1000,max: 100,}));//One IP can only make 100 requests every 15 minutes.

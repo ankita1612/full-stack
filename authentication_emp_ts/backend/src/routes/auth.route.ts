@@ -7,5 +7,5 @@ const authRouter = express.Router()
 
 authRouter.post('/register', singleUpload.single('profile_image'), validateRegister, isRequestValidated, authController.register)
 authRouter.post('/login', validateLogin, isRequestValidated, authController.login)
-
+authRouter.post('/refresh', authController.refresh)
 export default authRouter;
