@@ -5,6 +5,8 @@ import { Link, useLocation } from "react-router-dom";
 import type { IEmployee } from "../../interface/employee.interface";
 import EmployeeRow from "./EmployeeRow";
 import Alert from "react-bootstrap/Alert";
+import axios from "axios";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 function EmployeeList() {
   const [employeeData, setemployeeData] = useState<IEmployee[]>([]);
