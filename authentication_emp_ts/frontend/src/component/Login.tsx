@@ -8,7 +8,6 @@ import { useNavigate, useLocation } from "react-router";
 import axios from "axios";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import { useAuth } from "../context/AuthContext";
-import apiClient from "../utils/apiClient";
 
 const Login = () => {
   let navigate = useNavigate();
@@ -47,9 +46,12 @@ const Login = () => {
         password: data.password,
       };
 
-      const result = await apiClient.post("/api/auth/login", userData);
+      const result = await axios.post(
+        BACKEND_URL + "/api/auth/login",
+        userData,
+      );
       const user_data = {
-        accessToken: result.data.data.accessToken,
+        token: result.data.data.token,
         user: {
           username: result.data.data.user.name,
           id: result.data.data.user._id,
@@ -58,7 +60,7 @@ const Login = () => {
       //localStorage.setItem("user_data", JSON.stringify(user_data));
 
       //context API
-      login(user_data.accessToken, user_data.user);
+      login(user_data.token, user_data.user);
       //end context API
       navigate("/post/list");
     } catch (error: any) {

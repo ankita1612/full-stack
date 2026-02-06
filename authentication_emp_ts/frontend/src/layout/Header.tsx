@@ -9,7 +9,7 @@ import { useAuth } from "../context/AuthContext";
 
 function Header() {
   const navigate = useNavigate();
-  const { logout, user, loading, accessToken } = useAuth();
+  const { logout, user, loading } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -22,7 +22,6 @@ function Header() {
 
   return (
     <Card.Header className="p-0">
-      [{accessToken}]
       <Navbar expand="lg" bg="light">
         <Container>
           <Navbar.Brand as={NavLink} to="/">

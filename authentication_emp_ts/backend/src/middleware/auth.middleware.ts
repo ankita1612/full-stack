@@ -17,12 +17,12 @@ const authentication = async (req: AuthRequest, res: Response, next: NextFunctio
 
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-
-    if (!decoded || !decoded._id) {
+console.log(decoded)
+    if (!decoded || !decoded.id) {
       throw new ApiError("Invalid token payload", 401);
     }
 
-    const user = await User.findById(decoded._id).select("_id email role");
+    const user = await User.findById(decoded.id).select("_id email");
     if (!user) {
       throw new ApiError("User not found", 401);
     }

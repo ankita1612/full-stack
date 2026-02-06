@@ -2,7 +2,6 @@ import Button from "react-bootstrap/Button";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import Alert from "react-bootstrap/Alert";
 import Card from "react-bootstrap/Card";
-import apiClient from "../../utils/apiClient";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import React, { useEffect, useState, useRef } from "react";
@@ -63,7 +62,7 @@ function PostAdd() {
     const fetchPost = async () => {
       setLoading(true);
       try {
-        const { data } = await apiClient.get(`/api/post/${id}`);
+        const { data } = await axios.get(BACKEND_URL + `/api/post/${id}`);
         Object.entries(data.data).forEach(([k, v]) =>
           setValue(k as keyof IPost, v),
         );
@@ -123,9 +122,9 @@ function PostAdd() {
       };
       let res: any;
       if (mode == "add") {
-        res = await apiClient.post("/api/post", send_data);
+        res = await axios.post(BACKEND_URL + "/api/post", send_data);
       } else {
-        res = await apiClient.put("/api/post/" + id, send_data);
+        res = await axios.put(BACKEND_URL + "/api/post/" + id, send_data);
       }
 
       navigate("/post/list", {

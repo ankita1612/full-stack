@@ -7,7 +7,6 @@ import type { registrationInterface } from "../interface/registrations.interface
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-import apiClient from "../utils/apiClient";
 
 const Registration = () => {
   const navigate = useNavigate();
@@ -34,7 +33,7 @@ const Registration = () => {
   const onSubmit = async (data: registrationInterface) => {
     try {
       data.status = "active";
-      const result = await apiClient.post("/api/auth/register", data);
+      const result = await axios.post(BACKEND_URL + "/api/auth/register", data);
       setMsg(result.data.message);
       setMsgType("success");
       return navigate("/login");

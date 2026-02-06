@@ -5,7 +5,6 @@ import { Link, useLocation } from "react-router-dom";
 import type { IEmployee } from "../../interface/employee.interface";
 import EmployeeRow from "./EmployeeRow";
 import Alert from "react-bootstrap/Alert";
-import apiClient from "../../utils/apiClient";
 
 function EmployeeList() {
   const [employeeData, setemployeeData] = useState<IEmployee[]>([]);
@@ -35,7 +34,7 @@ function EmployeeList() {
     setLoading(true);
 
     try {
-      const { data } = await apiClient.get(`/api/employee`, {
+      const { data } = await axios.get(BACKEND_URL + `/api/employee`, {
         signal: controller.signal,
       });
       setemployeeData(data.data);
@@ -61,7 +60,7 @@ function EmployeeList() {
     setemployeeData((prev) => prev.filter((p) => p._id !== id));
 
     try {
-      await apiClient.delete(`/api/employee/${id}`);
+      await axios.delete(BACKEND_URL + `/api/employee/${id}`);
       setMsg("Deleted successfully");
       setMsgType("success");
     } catch (error: any) {

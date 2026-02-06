@@ -1,5 +1,4 @@
 import User from "../models/user.model";
-import RefreshToken from "../models/refresh.model";
 import  IUser ,{ILoginResponse, ILogin}  from "../interface/user.interface";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken"
@@ -33,62 +32,20 @@ export class AuthService {
         throw new ApiError("Invalid password", 401);
     }
 
-    if (!process.env.ACCESS_SECRET || !process.env.REFRESH_SECRET  ) {
-      throw new ApiError("ACCESS_SECRET or REFRESH_SECRET not configured",500);
+    if (!process.env.JWT_SECRET ) {
+      throw new ApiError("JWT_SECRET not configured",500);
     }
 
-    const accessToken = jwt.sign({ id: user._id }, process.env.ACCESS_SECRET!, {
-    expiresIn: "15m",
-  });
+    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET!);
 
-  const refreshToken = jwt.sign({ id: user._id }, process.env.REFRESH_SECRET!, {
-    expiresIn: "7d",
-  });
 
-  const hashedToken = crypto.createHash("sha256").update(refreshToken).digest("hex");
-
-  await RefreshToken.create({
-    userId: user._id,
-    token: hashedToken,
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-  });
 
     const userObj = user.toObject();
    // delete (userObj as any).password;
 
     return {
-      user: userObj, accessToken, refreshToken,
+      user: userObj, token 
     };
-  }
-
-
-
-  async refreshAccessToken(incomingToken: string)  {
-    if (!incomingToken) throw new ApiError("No refresh token", 401);
-
-    const hashedToken = crypto
-      .createHash("sha256")
-      .update(incomingToken)
-      .digest("hex");
-
-    const stored = await RefreshToken.findOne({ token: hashedToken });
-    if (!stored) throw new ApiError("Invalid session", 403);
-
-    // Verify JWT integrity
-    const decoded: any = jwt.verify(incomingToken, process.env.REFRESH_SECRET!);
-
-    // Check expiry in DB
-    if (stored.expiresAt < new Date()) {
-      throw new ApiError("Refresh token expired", 403);
-    }
-
-    const newAccessToken = jwt.sign(
-      { id: decoded.id },
-      process.env.ACCESS_SECRET!,
-      { expiresIn: "15m" }
-    );
-
-    return newAccessToken;
-  };
+  }  
 }
 export const authService = new AuthService();
