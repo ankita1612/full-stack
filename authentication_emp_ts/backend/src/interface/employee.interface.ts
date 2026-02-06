@@ -1,7 +1,8 @@
 export default interface IEmployee {
   title: string;  
   single_image?:string | null;
-  multi_image?:string[];
+  multiple_image?:string[];
+  //existingImages?:string[];
   DOB:Date;
 }
 

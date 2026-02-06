@@ -9,7 +9,7 @@ const employeeSchema = new Schema<IEmployee>({
         type: String,
         default: ""
     },
-    multi_image: {
+    multiple_image: {
         type: [String],
         default: []
     },

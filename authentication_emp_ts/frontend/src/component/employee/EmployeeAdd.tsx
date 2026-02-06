@@ -15,7 +15,7 @@ import type { IEmployee } from "../../interface/employee.interface";
 import axios from "axios";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 type FormDataType = {
-  multi_image: FileList | File[];
+  multiple_image: File[];
 };
 const schema = yup.object().shape({
   title: yup.string().required("Title is required"),
@@ -30,7 +30,7 @@ const schema = yup.object().shape({
       if (!value || !(value instanceof File)) return false;
       return value.size <= 2 * 1024 * 1024;
     }),
-  multi_image: yup
+  multiple_image: yup
     .mixed()
     .test("required", "At least one file required", (value: any) => {
       return value && value.length > 0;
@@ -72,17 +72,33 @@ function EmployeeAdd() {
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState("");
   const [msgType, setMsgType] = useState<"success" | "danger" | "">("");
-
+  const [existingImage, setExistingImage] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [newImagesPreview, setNewImagesPreview] = useState<string[]>([]);
+  const [newImages, setNewImages] = useState<File[]>([]);
   useEffect(() => {
     if (id) setMode("edit");
   }, [id]);
-
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+      newImagesPreview.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [preview, newImagesPreview]);
   useEffect(() => {
     if (msg && msgType === "danger") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       requestAnimationFrame(() => topRef.current?.focus());
     }
   }, [msg, msgType]);
+  const handleRemoveExisting = (imgPath: string) => {
+    setExistingImages((prev) => prev.filter((img) => img !== imgPath));
+  };
+  const handleRemoveNew = (index: number) => {
+    setNewImages((prev) => prev.filter((_, i) => i !== index));
+    setNewImagesPreview((prev) => prev.filter((_, i) => i !== index));
+  };
   useEffect(() => {
     if (!id) return;
     const fetchEmployee = async () => {
@@ -100,6 +116,8 @@ function EmployeeAdd() {
         //   setValue(k as keyof IEmployee, v),
         // );
         setValue("title", data.data.title);
+        setExistingImage(data.data.single_image);
+        setExistingImages(data.data.multiple_image || []); // array of paths
         if (data?.data?.title) {
           const date = new Date(data.data.DOB);
           setValue("DOB", date.toISOString().split("T")[0]);
@@ -163,10 +181,13 @@ function EmployeeAdd() {
       if (data.single_image) {
         formData.append("single_image", data.single_image);
       }
-      console.log(data.multi_image);
-      if (data.multi_image) {
-        data.multi_image.forEach((file) => {
-          formData.append("multi_image", file);
+      if (mode === "edit") {
+        formData.append("existingImages", JSON.stringify(existingImages));
+      }
+
+      if (data.multiple_image?.length) {
+        data.multiple_image.forEach((file) => {
+          formData.append("multiple_image", file);
         });
       }
       let res: any;
@@ -234,6 +255,7 @@ function EmployeeAdd() {
                 {errors.title?.message}
               </Form.Control.Feedback>
             </Form.Group>
+
             <Form.Group>
               <Form.Label>Upload single_image</Form.Label>
               <Form.Control
@@ -241,34 +263,78 @@ function EmployeeAdd() {
                 accept=".jpg,.jpeg,.png"
                 isInvalid={!!errors.single_image}
                 onChange={(e) => {
-                  const files = (e.target as HTMLInputElement).files;
-                  setValue("single_image", files?.[0] as File);
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (file) {
+                    setValue("single_image", file); // File object
+                    setPreview(URL.createObjectURL(file)); // Preview
+                  }
                 }}
               />
               <Form.Control.Feedback type="invalid">
                 {errors.single_image?.message}
               </Form.Control.Feedback>
             </Form.Group>
-            <Form.Group>
-              <Form.Label>Upload Multiple Files</Form.Label>
-
-              <Form.Control
-                type="file"
-                multiple
-                accept=".jpg,.jpeg,.png,.pdf"
-                isInvalid={!!errors.multi_image}
-                onChange={(e) => {
-                  const files = (e.target as HTMLInputElement).files;
-                  if (files) {
-                    setValue("multi_image", Array.from(files)); // File[]
-                  }
-                }}
+            {preview ? (
+              <img src={preview} width={150} height={150} alt="preview" />
+            ) : existingImage ? (
+              <img
+                src={`${BACKEND_URL}/${existingImage}`}
+                width={150}
+                height={150}
+                alt="profile"
               />
+            ) : null}
+            <Form.Control
+              type="file"
+              multiple
+              accept=".jpg,.jpeg,.png,.pdf"
+              isInvalid={!!errors.multiple_image}
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []);
+                setValue("multiple_image", files);
 
-              <Form.Control.Feedback type="invalid">
-                {errors.multi_image?.message}
-              </Form.Control.Feedback>
-            </Form.Group>
+                const previews = files.map((file) => URL.createObjectURL(file));
+                setNewImagesPreview(previews);
+              }}
+            />
+            <div className="d-flex gap-2 flex-wrap">
+              {/* 🆕 SHOW NEW IMAGES IF SELECTED */}
+              {existingImages.map((img, i) => (
+                <div key={i} style={{ position: "relative" }}>
+                  <img src={`${BACKEND_URL}/${img}`} width="120" />
+
+                  <Button
+                    size="sm"
+                    variant="danger"
+                    style={{ position: "absolute", top: 0, right: 0 }}
+                    onClick={() => handleRemoveExisting(img)}
+                  >
+                    ✖
+                  </Button>
+                </div>
+              ))}
+              {newImagesPreview.length > 0 &&
+                newImagesPreview.map((src, i) => (
+                  <div key={i} style={{ position: "relative" }}>
+                    <img src={src} width="120" />
+
+                    <Button
+                      size="sm"
+                      variant="danger"
+                      style={{ position: "absolute", top: 0, right: 0 }}
+                      onClick={() => handleRemoveNew(i)}
+                    >
+                      ✖
+                    </Button>
+                  </div>
+                ))}
+
+              {/* 📦 ELSE SHOW EXISTING IMAGES */}
+              {newImagesPreview.length === 0 &&
+                existingImages.map((img, i) => (
+                  <img key={i} src={`${BACKEND_URL}/${img}`} width="120" />
+                ))}
+            </div>
             <Form.Group>
               <Form.Label>Select Date</Form.Label>
               <Form.Control

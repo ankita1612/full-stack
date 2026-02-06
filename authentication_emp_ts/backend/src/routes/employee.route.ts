@@ -8,7 +8,7 @@ import {multi_upload} from "../middleware/multiupload.middleware";
 
 employeeRouter.post("/",authentication, multi_upload.fields([
     { name: "single_image", maxCount: 1 },
-    { name: "multi_image", maxCount: 5 },
+    { name: "multiple_image", maxCount: 5 },
   ]),
   validateAdd,
   isRequestValidated,
@@ -20,7 +20,7 @@ employeeRouter.put(
   "/:id",authentication,
   multi_upload.fields([
     { name: "single_image", maxCount: 1 },
-    { name: "multi_image", maxCount: 5 },
+    { name: "multiple_image", maxCount: 5 },
   ]),
   validateId,
   validateEdit,
@@ -28,6 +28,7 @@ employeeRouter.put(
   employeeController.updateEmployee
 );
 employeeRouter.delete('/:id',authentication,validateId, employeeController.deleteEmployee)
+//employeeRouter.deleteImage('/:id',authentication,validateId, employeeController.deleteImage)
 
 
 export default employeeRouter;

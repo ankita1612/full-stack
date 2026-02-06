@@ -1,8 +1,8 @@
 export interface IEmployee {
   _id:string;
   title: string;
-  single_image: string;
-  multi_image: string[];
+  single_image?: File;
+  multiple_image?: File[];
   DOB:Date;
   
 }
