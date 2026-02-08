@@ -104,12 +104,12 @@ function EmployeeAdd() {
     const fetchEmployee = async () => {
       setLoading(true);
       const stored = JSON.parse(localStorage.getItem("auth_data") || "{}");
-      const token = stored?.accessToken;
+      const accessToken = stored?.accessToken;
       try {
         const { data } = await axios.get(`${BACKEND_URL}/api/employee/${id}`, {
           headers: {
             "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
         // Object.entries(data.data).forEach(([k, v]) =>
@@ -161,11 +161,11 @@ function EmployeeAdd() {
     setLoading(true);
     try {
       const stored = JSON.parse(localStorage.getItem("auth_data") || "{}");
-      const token = stored?.accessToken;
+      const accessToken = stored?.accessToken;
       const header = {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       };
 

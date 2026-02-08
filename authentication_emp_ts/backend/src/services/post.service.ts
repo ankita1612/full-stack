@@ -27,7 +27,57 @@ export class PostService {
   async getPosts(): Promise<IPost[]> {
     return Post.find().sort({_id:-1});
   }
+ async getPostsWithPagination(query: {
+  search?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}) {
+  const {
+    search = '',
+    page = 1,
+    limit = 10,
+    sortBy = '_id',
+    sortOrder = 'desc',
+  } = query;
 
+  const skip = (page - 1) * limit;
+
+  // 🔍 Search condition
+  const searchQuery = search
+    ? {
+        $or: [
+          { title: { $regex: search, $options: 'i' } },
+          { content: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { author: { $regex: search, $options: 'i' } },
+        ],
+      }
+    : {};
+
+  // 🔃 Sorting
+  const sortOptions: any = {
+    [sortBy]: sortOrder === 'asc' ? 1 : -1,
+  };
+
+  // 📄 Fetch data
+  const [data, total] = await Promise.all([
+    Post.find(searchQuery)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(limit),
+
+    Post.countDocuments(searchQuery),
+  ]);
+
+  return {
+    data,
+    total,
+    page,
+    limit,
+  };
+}
   async getPost(id: string): Promise<IPost | null> {   
     if (!Types.ObjectId.isValid(id)) { 
         throw new ApiError("Invalid post id", 400);            

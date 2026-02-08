@@ -1,60 +1,119 @@
-import axios from "axios";
-const BACKEND_URL="http://localhost:5000"
+import axios, { AxiosError } from "axios";
+
+const BACKEND_URL = "http://localhost:5000";
 
 const apiClient = axios.create({
   baseURL: BACKEND_URL,
-  withCredentials: true,  
+  withCredentials: true,
 });
 
-apiClient.interceptors.request.use((request) => {
-  const stored = localStorage.getItem("auth_data");
-
-  if (stored) {
-    try {
-      const parsed = JSON.parse(stored);
-      const accessToken = parsed?.accessToken;
-           
-      if (accessToken) {
-        request.headers = request.headers || {};
-        request.headers.Authorization = `Bearer ${accessToken}`;
-      }
-    } catch {
-      localStorage.removeItem("auth_data");
-    }
+/* =======================
+   Auth Context Injection
+======================= */
+let accessToken: string | null = (() => {
+  try {
+    const stored = localStorage.getItem("auth_data");
+    if (!stored) return null;           
+    return JSON.parse(stored)?.accessToken ?? null;
+  } catch {
+    return null;
   }
-  return request;
+})();
+let updateAccessToken: ((accessToken: string) => void) | null = null;
+let logout: (() => void) | null = null;
+
+export const injectAuthContext = (authContext: {
+  accessToken: string | null;
+  updateAccessToken: (accessToken: string) => void;
+  logout: () => void;
+}) => {
+  if (authContext.accessToken) {
+    accessToken = authContext.accessToken;
+  }
+  updateAccessToken = authContext.updateAccessToken;
+  logout = authContext.logout;
+};
+
+/* =======================
+   Refresh Token Control
+======================= */
+let isRefreshing = false;
+let failedQueue: {
+  resolve: (accessToken: string) => void;
+  reject: (err: any) => void;
+}[] = [];
+
+const processQueue = (error: any, accessToken: string | null = null) => {
+  failedQueue.forEach((p) => {
+    if (error) p.reject(error);
+    else p.resolve(accessToken!);
+  });
+  failedQueue = [];
+};
+
+/* =======================
+   Request Interceptor
+======================= */
+apiClient.interceptors.request.use((config: any) => {  
+  if (accessToken) {  
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return config;
 });
 
+/* =======================
+   Response Interceptor
+======================= */
 apiClient.interceptors.response.use(
-  (res) => res,
-  async (error) => {
-    const originalRequest = error.config;    
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes("/auth/login") && !originalRequest.url?.includes("/auth/refresh")) {
+  (response) => response,
+  async (error: AxiosError) => {
+    const originalRequest = error.config as any;
+
+    if (!originalRequest) {
+      return Promise.reject(error);
+    }
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes("/auth/login") &&
+      !originalRequest.url?.includes("/auth/refresh")
+    ) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({
+            resolve: (accessToken) => {
+              originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+              resolve(apiClient(originalRequest));
+            },
+            reject,
+          });
+        });
+      }
+
       originalRequest._retry = true;
+      isRefreshing = true;
 
-      try {        
-        const { data } = await axios.post(
-          BACKEND_URL+"/api/auth/refresh",
-          {},
-          { withCredentials: true }
-        );
-        const stored = JSON.parse(localStorage.getItem("auth_data") || "{}");        
-        stored.accessToken = data.accessToken;        
+      try {
+        const { data } = await apiClient.post("/api/auth/refresh");
 
-        const user_data = {
-        accessToken: data.accessToken,
-        user: {
-          username: stored.user.username ||  null,
-          id: stored.user._id,
-        },
-      };
-      localStorage.setItem("auth_data", JSON.stringify(user_data));
+        accessToken = data.accessToken;
+        updateAccessToken?.(data.accessToken);
 
-        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+        processQueue(null, data.accessToken);
+
+        originalRequest.headers.Authorization =
+          `Bearer ${data.accessToken}`;
+
         return apiClient(originalRequest);
-      } catch (error: any){        
-         localStorage.removeItem("auth_data");       
+      } catch (err) {
+        processQueue(err, null);
+        logout?.();
         window.location.href = "/login";
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
       }
     }
 

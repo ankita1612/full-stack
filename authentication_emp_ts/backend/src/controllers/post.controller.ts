@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { postService } from "../services/post.service";
-import  IPost  from "../interface/post.interface";
+import  IPost , {GetPostsQuery}  from "../interface/post.interface";
 import { Types } from "mongoose";
 
 class PostController {
@@ -31,7 +31,18 @@ class PostController {
       next(error); 
     }
 };
+ getPostsWithPagination = async (req: Request, res: Response) => {
+  const query: GetPostsQuery = {
+    search: req.query.search as string,
+    sortBy: req.query.sortBy as string,
+    sortOrder: req.query.sortOrder as 'asc' | 'desc',
+    page: req.query.page ? Number(req.query.page) : 1,
+    limit: req.query.limit ? Number(req.query.limit) : 10,
+  };
 
+  const posts = await postService.getPostsWithPagination(query);
+  res.json(posts);
+};
   updatePost = async (req: Request<{ id: string }, {}, Partial<IPost>>, res: Response, next: NextFunction): Promise<void> => {
     try {      
       const post = await postService.updatePost(req.params.id, req.body);

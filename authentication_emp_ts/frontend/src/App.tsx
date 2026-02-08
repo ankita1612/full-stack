@@ -6,6 +6,7 @@ import Header from "./layout/Header";
 import PostAdd from "./component/post/PostAdd";
 import PostList from "./component/post/PostList";
 import ListWithPagination from "./component/post/ListWithPagination";
+import ListWithServerPagination from "./component/post/ListWithServerPagination";
 
 import EmployeeAdd from "./component/employee/EmployeeAdd";
 import EmployeeList from "./component/employee/EmployeeList";
@@ -15,49 +16,66 @@ import Dashboard from "./component/Dashboard";
 import Aboutus from "./component/Aboutus";
 import ProductList from "./component/product/ProductList";
 import PageNotFound from "./component/PageNotFound";
+import { useAuth } from "./context/AuthContext";
+
+import { injectAuthContext } from "./utils/apiClient";
+
+const Injector = () => {
+  const auth = useAuth();
+
+  injectAuthContext(auth);
+  return null;
+};
 const App = () => {
   return (
-    <Card>
-      <Header></Header>
-      <Card.Body>
-        <Routes>
-          <Route path="/" element={<Navigate to="/registration" />} />
-          <Route element={<PublicRoute />}>
-            <Route path="/registration" element={<Registration />} />
-            <Route path="/login" element={<Login />} />
-          </Route>
-          <Route element={<PrivateRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/post/add/:id?" element={<PostAdd />} />
-            <Route path="/post/list" element={<PostList />} />
-            <Route
-              path="/post/listWithPagination"
-              element={<ListWithPagination />}
-            />
-            <Route path="/employee/add/:id?" element={<EmployeeAdd />} />
-            <Route path="/employee/list" element={<EmployeeList />} />
-          </Route>
+    <>
+      <Injector />
+      <Card>
+        <Header></Header>
+        <Card.Body>
+          <Routes>
+            <Route path="/" element={<Navigate to="/registration" />} />
+            <Route element={<PublicRoute />}>
+              <Route path="/registration" element={<Registration />} />
+              <Route path="/login" element={<Login />} />
+            </Route>
+            <Route element={<PrivateRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/post/add/:id?" element={<PostAdd />} />
+              <Route path="/post/list" element={<PostList />} />
+              <Route
+                path="/post/listWithPagination"
+                element={<ListWithPagination />}
+              />
+              <Route
+                path="/post/ListWithServerPagination"
+                element={<ListWithServerPagination />}
+              />
+              <Route path="/employee/add/:id?" element={<EmployeeAdd />} />
+              <Route path="/employee/list" element={<EmployeeList />} />
+            </Route>
 
-          <Route
-            path="/aboutus"
-            element={
-              <PublicRoute>
-                <Aboutus />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/product/list"
-            element={
-              <PrivateRoute>
-                <ProductList />
-              </PrivateRoute>
-            }
-          />
-          <Route path="*" element={<PageNotFound />} />
-        </Routes>
-      </Card.Body>
-    </Card>
+            <Route
+              path="/aboutus"
+              element={
+                <PublicRoute>
+                  <Aboutus />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/product/list"
+              element={
+                <PrivateRoute>
+                  <ProductList />
+                </PrivateRoute>
+              }
+            />
+            <Route path="*" element={<PageNotFound />} />
+          </Routes>
+        </Card.Body>
+      </Card>
+    </>
   );
 };
 

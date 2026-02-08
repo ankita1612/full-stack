@@ -10,7 +10,7 @@ import apiClient from "../utils/apiClient";
 
 function Header() {
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
+  const { logout, user, accessToken } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -27,6 +27,8 @@ function Header() {
 
   return (
     <Card.Header className="p-0">
+      {" "}
+      {accessToken}
       <Navbar expand="lg" bg="light">
         <Container>
           <Navbar.Brand as={NavLink} to="/">
@@ -59,7 +61,13 @@ function Header() {
                       as={NavLink}
                       to="/post/listWithPagination"
                     >
-                      List With Pagination
+                      Client Pagination
+                    </NavDropdown.Item>
+                    <NavDropdown.Item
+                      as={NavLink}
+                      to="/post/listWithServerPagination"
+                    >
+                      Server Pagination
                     </NavDropdown.Item>
                     <NavDropdown.Item as={NavLink} to="/post/add">
                       Add

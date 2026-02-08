@@ -10,3 +10,11 @@ export default interface IPost {
   createdAt:Date;
 }
 
+
+export interface GetPostsQuery {
+  search?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}

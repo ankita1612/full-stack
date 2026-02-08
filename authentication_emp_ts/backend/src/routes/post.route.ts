@@ -8,6 +8,7 @@ postRouter.get('/', authentication, postController.getPosts)
 postRouter.put('/:id', authentication, validateId, validateEdit, isRequestValidated, postController.updatePost)
 postRouter.delete('/:id', authentication, validateId, postController.deletePost)
 postRouter.post('/test', postController.testPost)
+postRouter.get('/serverPagination', authentication, postController.getPostsWithPagination)
 postRouter.get('/:id', authentication, validateId, postController.getPost)
 
 export default postRouter;

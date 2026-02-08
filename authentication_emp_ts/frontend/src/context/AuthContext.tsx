@@ -10,6 +10,7 @@ type AuthContextType = {
   user: User | null;
   login: (accessToken: string, user: User) => void;
   logout: () => void;
+  updateAccessToken: (accessToken: string) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -17,6 +18,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
+
+  const updateAccessToken = (accessToken: string) => {
+    setAccessToken(accessToken);
+
+    const stored = localStorage.getItem("auth_data");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      localStorage.setItem(
+        "auth_data",
+        JSON.stringify({ ...parsed, accessToken }),
+      );
+    }
+  };
 
   useEffect(() => {
     try {
@@ -44,7 +58,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ accessToken, user, login, logout }}>
+    <AuthContext.Provider
+      value={{ accessToken, user, login, logout, updateAccessToken }}
+    >
       {children}
     </AuthContext.Provider>
   );
