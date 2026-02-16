@@ -8,7 +8,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   (request) => {
-    const stored = localStorage.getItem("user_data");
+    const stored = localStorage.getItem("auth_data");
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
@@ -19,7 +19,7 @@ apiClient.interceptors.request.use(
         }
       } catch (err) {
         console.error("Invalid auth_data in localStorage");
-        localStorage.removeItem("user_data");
+        localStorage.removeItem("auth_data");
       }
     }
 

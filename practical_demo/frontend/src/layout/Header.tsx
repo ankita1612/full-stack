@@ -13,6 +13,7 @@ function Header() {
           <Nav className="me-auto">
             <Nav.Link href="/register">Register</Nav.Link>
             <Nav.Link href="/login">Login</Nav.Link>
+            <Nav.Link href="/logout">Logout</Nav.Link>
             <NavDropdown title="Admin" id="basic-nav-dropdown">
               <NavDropdown.Item href="/admin/list">List</NavDropdown.Item>
               <NavDropdown.Item href="/admin/add">Add</NavDropdown.Item>

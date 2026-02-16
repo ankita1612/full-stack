@@ -38,7 +38,6 @@ const Login = () => {
   }, [msg]);
 
   const onSubmit = async (data: loginInterface) => {
-    alert(11);
     try {
       const userData = {
         email: data.email,
@@ -53,7 +52,7 @@ const Login = () => {
           id: result.data.data.user._id,
         },
       };
-      localStorage.setItem("user_data", JSON.stringify(user_data));
+      localStorage.setItem("auth_data", JSON.stringify(user_data));
       //context API
       // login(user_data.accessToken, user_data.user);
       //end context API

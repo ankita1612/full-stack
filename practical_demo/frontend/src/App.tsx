@@ -5,6 +5,9 @@ import AdminList from "./component/admin/AdminList";
 import Card from "react-bootstrap/Card";
 import Registration from "./component/Registration";
 import Login from "./component/Login";
+import Home from "./component/Home";
+import PrivateRoute from "./layout/PrivateRoute";
+import PublicRoute from "./layout/PublicRoute";
 const App = () => {
   return (
     <>
@@ -12,11 +15,15 @@ const App = () => {
         <Header></Header>
         <Card.Body>
           <Routes>
-            <Route path="/" index element={<Login />} />
-            <Route path="/login" index element={<Login />} />
-            <Route path="/register" element={<Registration />} />
-            <Route path="/admin/add/:id?" element={<AdminAdd />} />
-            <Route path="/admin/list" element={<AdminList />} />
+            <Route path="/" index element={<Home />} />
+            <Route element={<PublicRoute />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Registration />} />
+            </Route>
+            <Route element={<PrivateRoute />}>
+              <Route path="/admin/add/:id?" element={<AdminAdd />} />
+              <Route path="/admin/list" element={<AdminList />} />
+            </Route>
           </Routes>
         </Card.Body>
       </Card>
