@@ -17,7 +17,7 @@ import Aboutus from "./component/Aboutus";
 import ProductList from "./component/product/ProductList";
 import PageNotFound from "./component/PageNotFound";
 import { useAuth } from "./context/AuthContext";
-
+import CustomHook from "./component/CustomHook";
 import { injectAuthContext } from "./utils/apiClient";
 
 const Injector = () => {
@@ -53,6 +53,7 @@ const App = () => {
               />
               <Route path="/employee/add/:id?" element={<EmployeeAdd />} />
               <Route path="/employee/list" element={<EmployeeList />} />
+              <Route path="/customHook" element={<CustomHook />} />
             </Route>
 
             <Route

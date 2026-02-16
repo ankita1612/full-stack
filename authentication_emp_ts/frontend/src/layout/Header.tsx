@@ -11,7 +11,7 @@ import apiClient from "../utils/apiClient";
 function Header() {
   const navigate = useNavigate();
   const { logout, user, accessToken } = useAuth();
-
+  console.log("header-->" + accessToken);
   const handleLogout = async () => {
     try {
       await apiClient.post("/api/auth/logout");
@@ -80,6 +80,9 @@ function Header() {
                     </NavDropdown.Item>
                     <NavDropdown.Item as={NavLink} to="/employee/add">
                       Add
+                    </NavDropdown.Item>
+                    <NavDropdown.Item as={NavLink} to="/customHook">
+                      Graph
                     </NavDropdown.Item>
                   </NavDropdown>
                   <NavDropdown title="Product">

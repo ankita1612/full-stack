@@ -27,8 +27,10 @@ employeeRouter.put(
   isRequestValidated,
   employeeController.updateEmployee
 );
+employeeRouter.get('/static/forgraph',authentication,employeeController.staticResult)
 employeeRouter.delete('/:id',authentication,validateId, employeeController.deleteEmployee)
 //employeeRouter.deleteImage('/:id',authentication,validateId, employeeController.deleteImage)
+
 
 
 export default employeeRouter;

@@ -117,6 +117,15 @@ const removedImages: string[] = dbImages.filter(
       next(error);
     }
   };
+  staticResult  = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {     
+      
+      const data=[{"Jan":100},{"feb":200},{"march":300},{"April":400},{"May":500}]
+      res.status(200).json({"success":true,"message":"success","data":data});
+    } catch (error) {
+      next(error);
+    }
+  };
   
 }
 export const employeeController = new EmployeeController();

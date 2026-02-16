@@ -22,6 +22,7 @@ const app = express();
 app.use(cookieParser());   
 
 app.use(cors({origin: process.env.FRONTEND_URL,credentials: true,})); //Allows browser to send secure credentials with request
+//credentials: true => if you are passing cookie from frontend
 app.use(helmet({crossOriginResourcePolicy: false,}));
 app.use(rateLimit({windowMs: 15 * 60 * 1000,max: 100,}));//One IP can only make 100 requests every 15 minutes.
 app.use(express.json({ limit: "10kb" }));

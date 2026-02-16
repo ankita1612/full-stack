@@ -1,112 +1,117 @@
-import mongoose from 'mongoose';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import { postService } from './post.service';
-import { Types } from "mongoose";
+import mongoose from "mongoose";
+import { MongoMemoryServer } from "mongodb-memory-server";
+import Post from "../models/post.model";
+import { postService } from "./admin.service";
+import ApiError from "../utils/api.error";
 
-describe('PostService CRUD with MongoDB', () => {
-  let mongoServer: MongoMemoryServer;
-  let post_created_id: Types.ObjectId | null = null
+let mongoServer: MongoMemoryServer;
 
-  beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = "mongodb://localhost:27017/post_crud2"    
-    await mongoose.connect(uri);
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  await mongoose.connect(mongoServer.getUri());
+});
+
+afterAll(async () => {
+  await mongoose.disconnect();
+  await mongoServer.stop();
+});
+
+afterEach(async () => {
+  await Post.deleteMany({});
+});
+
+const validPost = {
+  title: "Test Post",
+  email: "test@mail.com",
+  description: "Description",
+  author: "Ankita",
+  published: true,
+  option_type: "job",
+  skills: ["node"],
+  tags: ["mern"],
+};
+
+describe("PostService Integration Tests", () => {
+
+  //CREATE SUCCESS
+  it("should create post successfully", async () => {
+    const post = await postService.createPost(validPost);
+    expect(post._id).toBeDefined();
+    expect(post.email).toBe("test@mail.com");
   });
 
-  afterEach(async () => {
-   // await Post.deleteMany({});
+  //DUPLICATE EMAIL
+  it("should throw error if email already used", async () => {
+    await postService.createPost(validPost);
+    await expect(postService.createPost(validPost))
+      .rejects.toThrow("Email already used");
   });
 
-  afterAll(async () => {
-    // await mongoose.disconnect();
-    // await mongoServer.stop();
+  //GET ALL
+  it("should fetch all posts", async () => {
+    await postService.createPost(validPost);
+    const posts = await postService.getPosts();
+    expect(posts.length).toBe(1);
   });
 
-  it('should create a post', async () => {
-    const post = await postService.createPost({
-      title: 'Test title',
-      email:'ankita@yopmail.com',
-      description: 'Test description',
-      author: 'Ankita',      
-      published: false,
-      option_type:"AB",
-      skills:['php','html'],
-      tags:['Suspense']
+  //GET ONE
+  it("should fetch post by id", async () => {
+    const post = await postService.createPost(validPost);
+    const result = await postService.getPost(post._id.toString());
+    expect(result?.title).toBe("Test Post");
+  });
 
+  // INVALID ID
+  it("should throw error for invalid id", async () => {
+    await expect(postService.getPost("123"))
+      .rejects.toThrow("Invalid post id");
+  });
+
+  // UPDATE
+  it("should update post", async () => {
+    const post = await postService.createPost(validPost);
+    const updated = await postService.updatePost(post._id.toString(), {
+      title: "Updated Title",
     });
-    expect(post?._id).toBeDefined();
-    post_created_id = post!._id;
-    expect(post?.title).toBe('Test title');
-    expect(post?.published).toBe(false); // default value check
+    expect(updated?.title).toBe("Updated Title");
   });
 
-  it('should get all posts', async () => {
-    // await postService.createPost({
-    //   title: 'Post 1',
-    //   description: 'Desc 1',
-    //   author: 'User 1',
-    //   published: false,
-    // });
+  // UPDATE DUPLICATE EMAIL
+  it("should throw error if updating email to existing one", async () => {
+    await postService.createPost(validPost);
+    const second = await postService.createPost({ ...validPost, email: "new@mail.com" });
 
-    const posts = await postService.getPosts();   
-    expect(posts?.length ?? 0).toBeGreaterThan(1)
-    expect(posts?.[0]?.title).toBe('Test title');
+    await expect(
+      postService.updatePost(second._id.toString(), { email: "test@mail.com" })
+    ).rejects.toThrow("Email already used");
   });
 
-  it('should get post by id', async () => {
-    // const created = await postService.createPost({
-    //   title: 'Find me',
-    //   description: 'Find description',
-    //   author: 'Admin',
-    //   published: false,
-    // });
-    expect(post_created_id).not.toBeNull();
-    const post = await postService.getPost(post_created_id!.toString());
-    expect(post).not.toBeNull();
+  // DELETE
+  it("should delete post", async () => {
+    const post = await postService.createPost(validPost);
+    await postService.deletePost(post._id.toString());
 
-    if (!post) {
-      throw new Error('Post not found');
-    }
-    expect(post.title).toBe('Test title');
+    const found = await Post.findById(post._id);
+    expect(found).toBeNull();
   });
 
-  it('should update a post', async () => {
-    // const created = await postService.createPost({
-    //   title: 'Old title',
-    //   description: 'Old desc',
-    //   author: 'Admin',
-    //   published: false,
-    // });
-      expect(post_created_id).not.toBeNull();
-      const updated = await postService.updatePost(post_created_id!.toString(),
-        {
-          title: 'New title',
-          published: true,
-        }
-      );
+  // PAGINATION
+  it("should return paginated posts with search", async () => {
+    await postService.createPost(validPost);
+    await postService.createPost({
+      ...validPost,
+      email: "react@mail.com",
+      title: "React Job",
+    });
 
-      expect(updated).not.toBeNull();
+    const result = await postService.getPostsWithPagination({
+      search: "react",
+      page: 1,
+      limit: 10,
+    });
 
-      if (!updated) {
-        throw new Error('Post was not updated');
-      }
-
-      expect(updated.title).toBe('New title');
-      expect(updated.published).toBe(true);
+    expect(result.total).toBe(1);
+    expect(result.data[0].title).toBe("React Job");
   });
-  it('should delete a post', async () => {
-    // const created = await postService.createPost({
-    //   title: 'Delete me',
-    //   description: 'Delete desc',
-    //   author: 'Admin',
-    //   published: true,
-    // });
 
-      expect(post_created_id).not.toBeNull();
-
-      await postService.deletePost(post_created_id!.toString());
-
-     // const posts = await postService.getPosts();
-     // expect(posts?.length).toBe(0);
-  });
 });

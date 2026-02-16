@@ -38,7 +38,7 @@ export class AuthService {
     }
 
     const accessToken = jwt.sign({ id: user._id }, process.env.ACCESS_SECRET!, {
-    expiresIn: "1m",
+    expiresIn: "1d",
   });
 
   const refreshToken = jwt.sign({ id: user._id }, process.env.REFRESH_SECRET!, {

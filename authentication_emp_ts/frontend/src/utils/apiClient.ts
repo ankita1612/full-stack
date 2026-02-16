@@ -4,7 +4,7 @@ const BACKEND_URL = "http://localhost:5000";
 
 const apiClient = axios.create({
   baseURL: BACKEND_URL,
-  withCredentials: true,
+  withCredentials: true, //add this If frontend and backend are on different ports/domains
 });
 
 /* =======================
@@ -54,11 +54,19 @@ const processQueue = (error: any, accessToken: string | null = null) => {
 /* =======================
    Request Interceptor
 ======================= */
-apiClient.interceptors.request.use((config: any) => {  
-  if (accessToken) {  
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${accessToken}`;
+apiClient.interceptors.request.use((config: any) => {
+  const stored = localStorage.getItem("auth_data");
+
+  if (stored) {
+    const parsed = JSON.parse(stored);
+    const token = parsed?.accessToken;
+
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
+
   return config;
 });
 
